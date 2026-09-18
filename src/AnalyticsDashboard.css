@@ -664,3 +664,109 @@
     gap: 12px;
   }
 }
+
+/* =========================================================
+   STEP 5.7C — ANALYTICS DARK / LIGHT MODE
+   Existing layout, spacing, sizing and component structure
+   are intentionally preserved.
+   ========================================================= */
+
+[data-analytics-theme="light"] body {
+  background: #f5f7fb;
+}
+
+[data-analytics-theme="light"] .analytics-dashboard {
+  background: #f5f7fb;
+  color: #182235;
+}
+
+[data-analytics-theme="light"] .analytics-label {
+  color: #2563eb;
+}
+
+[data-analytics-theme="light"] .analytics-header h1,
+[data-analytics-theme="light"] .analytics-section-header h2,
+[data-analytics-theme="light"] .analytics-card-value,
+[data-analytics-theme="light"] .analytics-project-info strong,
+[data-analytics-theme="light"] .analytics-project-views strong,
+[data-analytics-theme="light"] .analytics-insight-card h3 {
+  color: #182235;
+}
+
+[data-analytics-theme="light"] .analytics-description,
+[data-analytics-theme="light"] .analytics-section-header p,
+[data-analytics-theme="light"] .analytics-card-title,
+[data-analytics-theme="light"] .analytics-project-views span,
+[data-analytics-theme="light"] .analytics-insight-label,
+[data-analytics-theme="light"] .analytics-insight-card span,
+[data-analytics-theme="light"] .analytics-activity-date,
+[data-analytics-theme="light"] .analytics-activity-legend-item,
+[data-analytics-theme="light"] .analytics-footer {
+  color: #64748b;
+}
+
+[data-analytics-theme="light"] .analytics-projects,
+[data-analytics-theme="light"] .analytics-activity,
+[data-analytics-theme="light"] .analytics-insights {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+[data-analytics-theme="light"] .analytics-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.07);
+}
+
+[data-analytics-theme="light"] .analytics-card-icon,
+[data-analytics-theme="light"] .analytics-section-icon,
+[data-analytics-theme="light"] .analytics-insight-icon {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.12);
+}
+
+[data-analytics-theme="light"] .analytics-refresh-button {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 42, 0.1);
+  color: #182235;
+}
+
+[data-analytics-theme="light"] .analytics-refresh-button:hover:not(:disabled) {
+  background: rgba(124, 92, 255, 0.08);
+}
+
+[data-analytics-theme="light"] .analytics-status {
+  color: #475569;
+}
+
+[data-analytics-theme="light"] .analytics-project-row {
+  border-color: rgba(15, 23, 42, 0.07);
+}
+
+[data-analytics-theme="light"] .analytics-project-rank {
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+}
+
+[data-analytics-theme="light"] .analytics-project-bar {
+  background: rgba(15, 23, 42, 0.07);
+}
+
+[data-analytics-theme="light"] .analytics-activity-bar-wrapper {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+[data-analytics-theme="light"] .analytics-insight-card {
+  background: rgba(248, 250, 252, 0.9);
+  border-color: rgba(15, 23, 42, 0.07);
+}
+
+[data-analytics-theme="light"] .analytics-footer {
+  border-top-color: rgba(15, 23, 42, 0.08);
+}
+
+[data-analytics-theme="light"] .analytics-loading,
+[data-analytics-theme="light"] .analytics-error {
+  color: #182235;
+}

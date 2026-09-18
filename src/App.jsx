@@ -29,8 +29,15 @@ function App() {
     email: "",
     subject: "",
     message: "",
+    portfolioWebsite: "",
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [contactFormErrors, setContactFormErrors] = useState({});
+  const [contactFormSubmitting, setContactFormSubmitting] = useState(false);
+  const [contactFormStatus, setContactFormStatus] = useState({
+    type: "",
+    message: "",
+  });
 
   // ================= STEP 8: DARK / LIGHT MODE =================
   const [theme, setTheme] = useState(
@@ -173,8 +180,29 @@ function App() {
       [name]: value,
     }));
 
+    setContactFormErrors((previous) => {
+      if (!previous[name]) {
+        return previous;
+      }
+
+      const updatedErrors = {
+        ...previous,
+      };
+
+      delete updatedErrors[name];
+
+      return updatedErrors;
+    });
+
     if (formSubmitted) {
       setFormSubmitted(false);
+    }
+
+    if (contactFormStatus.message) {
+      setContactFormStatus({
+        type: "",
+        message: "",
+      });
     }
   };
 
@@ -324,8 +352,63 @@ function App() {
     }
   };
 
+  const validateContactForm = () => {
+    const errors = {};
+
+    const name = contactForm.name.trim();
+    const email = contactForm.email.trim();
+    const subject = contactForm.subject.trim();
+    const message = contactForm.message.trim();
+
+    if (!name) {
+      errors.name = "Please enter your name.";
+    } else if (name.length < 2) {
+      errors.name = "Name must be at least 2 characters.";
+    }
+
+    if (!email) {
+      errors.email = "Please enter your email address.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+
+    if (!subject) {
+      errors.subject = "Please enter a subject.";
+    } else if (subject.length < 3) {
+      errors.subject = "Subject must be at least 3 characters.";
+    }
+
+    if (!message) {
+      errors.message = "Please enter your message.";
+    } else if (message.length < 10) {
+      errors.message = "Message must be at least 10 characters.";
+    }
+
+    setContactFormErrors(errors);
+
+    return Object.keys(errors).length === 0;
+  };
+
   const handleContactSubmit = async (e) => {
     e.preventDefault();
+
+    if (contactFormSubmitting) {
+      return;
+    }
+
+    const isValid = validateContactForm();
+
+    if (!isValid) {
+      setFormSubmitted(false);
+      return;
+    }
+
+    setContactFormSubmitting(true);
+    setFormSubmitted(false);
+    setContactFormStatus({
+      type: "",
+      message: "",
+    });
 
     try {
       const response = await fetch("http://localhost:5000/api/contact", {
@@ -333,7 +416,13 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(contactForm),
+        body: JSON.stringify({
+          name: contactForm.name.trim(),
+          email: contactForm.email.trim(),
+          subject: contactForm.subject.trim(),
+          message: contactForm.message.trim(),
+          website: contactForm.portfolioWebsite.trim(),
+        }),
       });
 
       const data = await response.json();
@@ -343,6 +432,11 @@ function App() {
       }
 
       setFormSubmitted(true);
+      setContactFormErrors({});
+      setContactFormStatus({
+        type: "success",
+        message: "Thank you! Your message has been submitted successfully.",
+      });
 
       fetch("http://localhost:5000/api/analytics", {
         method: "POST",
@@ -365,10 +459,18 @@ function App() {
         email: "",
         subject: "",
         message: "",
+        portfolioWebsite: "",
       });
     } catch (error) {
       console.error("Contact form error:", error);
-      alert("Sorry, your message could not be sent. Please try again.");
+      setFormSubmitted(false);
+      setContactFormStatus({
+        type: "error",
+        message:
+          error.message || "Sorry, your message could not be sent. Please try again.",
+      });
+    } finally {
+      setContactFormSubmitting(false);
     }
   };
 
@@ -1419,12 +1521,41 @@ function App() {
 
               <input
                 type="text"
+                name="portfolioWebsite"
+                value={contactForm.portfolioWebsite}
+                onChange={handleContactChange}
+                tabIndex="-1"
+                autoComplete="off"
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  left: "-9999px",
+                  width: "1px",
+                  height: "1px",
+                  opacity: 0,
+                  pointerEvents: "none",
+                }}
+              />
+
+              <input
+                type="text"
                 name="name"
                 placeholder="Your Name"
                 value={contactForm.name}
                 onChange={handleContactChange}
                 required
+                aria-invalid={Boolean(contactFormErrors.name)}
+                aria-describedby={contactFormErrors.name ? "contact-name-error" : undefined}
               />
+
+              {contactFormErrors.name && (
+                <small
+                  id="contact-name-error"
+                  style={{ color: "#dc3545", fontWeight: 600 }}
+                >
+                  {contactFormErrors.name}
+                </small>
+              )}
 
               <input
                 type="email"
@@ -1433,7 +1564,18 @@ function App() {
                 value={contactForm.email}
                 onChange={handleContactChange}
                 required
+                aria-invalid={Boolean(contactFormErrors.email)}
+                aria-describedby={contactFormErrors.email ? "contact-email-error" : undefined}
               />
+
+              {contactFormErrors.email && (
+                <small
+                  id="contact-email-error"
+                  style={{ color: "#dc3545", fontWeight: 600 }}
+                >
+                  {contactFormErrors.email}
+                </small>
+              )}
 
               <input
                 type="text"
@@ -1442,7 +1584,18 @@ function App() {
                 value={contactForm.subject}
                 onChange={handleContactChange}
                 required
+                aria-invalid={Boolean(contactFormErrors.subject)}
+                aria-describedby={contactFormErrors.subject ? "contact-subject-error" : undefined}
               />
+
+              {contactFormErrors.subject && (
+                <small
+                  id="contact-subject-error"
+                  style={{ color: "#dc3545", fontWeight: 600 }}
+                >
+                  {contactFormErrors.subject}
+                </small>
+              )}
 
               <textarea
                 name="message"
@@ -1451,16 +1604,38 @@ function App() {
                 value={contactForm.message}
                 onChange={handleContactChange}
                 required
+                aria-invalid={Boolean(contactFormErrors.message)}
+                aria-describedby={contactFormErrors.message ? "contact-message-error" : undefined}
               ></textarea>
 
-              <button type="submit">
-                Send Message
+              {contactFormErrors.message && (
+                <small
+                  id="contact-message-error"
+                  style={{ color: "#dc3545", fontWeight: 600 }}
+                >
+                  {contactFormErrors.message}
+                </small>
+              )}
+
+              <button type="submit" disabled={contactFormSubmitting}>
+                {contactFormSubmitting ? "Sending..." : "Send Message"}
                 <i className="bi bi-arrow-right"></i>
               </button>
 
-              {formSubmitted && (
-                <p style={{ marginTop: "15px", marginBottom: 0, fontWeight: 600 }}>
-                  Thank you! Your message has been submitted successfully.
+              {contactFormStatus.message && (
+                <p
+                  style={{
+                    marginTop: "15px",
+                    marginBottom: 0,
+                    fontWeight: 600,
+                    color:
+                      contactFormStatus.type === "success"
+                        ? "#198754"
+                        : "#dc3545",
+                  }}
+                  role="alert"
+                >
+                  {contactFormStatus.message}
                 </p>
               )}
 

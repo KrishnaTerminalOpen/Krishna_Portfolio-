@@ -30,6 +30,9 @@ function AnalyticsDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [error, setError] = useState("");
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("analytics-theme") || "dark"
+  );
 
   const loadAnalytics = (isRefresh = false) => {
     if (isRefresh) {
@@ -183,6 +186,11 @@ function AnalyticsDashboard() {
 
     URL.revokeObjectURL(url);
   };
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-analytics-theme", theme);
+    localStorage.setItem("analytics-theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     loadAnalytics();
@@ -345,6 +353,32 @@ function AnalyticsDashboard() {
           >
             <i className="bi bi-download"></i>
             Export
+          </button>
+
+          <button
+            className="analytics-refresh-button"
+            onClick={() =>
+              setTheme((currentTheme) =>
+                currentTheme === "dark" ? "light" : "dark"
+              )
+            }
+            title={
+              theme === "dark"
+                ? "Switch to light mode"
+                : "Switch to dark mode"
+            }
+            aria-label={
+              theme === "dark"
+                ? "Switch to light mode"
+                : "Switch to dark mode"
+            }
+          >
+            <i
+              className={`bi ${
+                theme === "dark" ? "bi-sun" : "bi-moon"
+              }`}
+            ></i>
+            {theme === "dark" ? "Light" : "Dark"}
           </button>
 
           <button
