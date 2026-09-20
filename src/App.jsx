@@ -229,7 +229,7 @@ function App() {
     });
   };
 
-  const resumePdfUrl = `${window.location.origin}/resume.pdf`;
+  const resumePdfUrl = "https://krishnasahu-portfolio.vercel.app/resume.pdf";
 
   const handleCopyResumePdfLink = async () => {
     try {
