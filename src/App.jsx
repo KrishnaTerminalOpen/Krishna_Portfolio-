@@ -1182,7 +1182,15 @@ function App() {
                 <i className="bi bi-arrow-right"></i>
               </a>
 
-              <a href="/#/admin/projects" className="view-all">
+              <a
+                href="/#/admin/projects"
+                className="view-all"
+                onClick={(event) => {
+                  event.preventDefault();
+                  window.location.hash = "/admin/projects";
+                  window.location.reload();
+                }}
+              >
                 <i className="bi bi-plus-lg" style={{ marginRight: "7px" }}></i>
                 Add Project
               </a>
