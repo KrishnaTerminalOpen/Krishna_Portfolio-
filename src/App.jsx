@@ -9,6 +9,9 @@ function App() {
   const [projectFilter, setProjectFilter] = useState("All");
   const [projectSearch, setProjectSearch] = useState("");
   const [certificateFilter, setCertificateFilter] = useState("All");
+  const [shareResumeOpen, setShareResumeOpen] = useState(false);
+  const [showMoreShareOptions, setShowMoreShareOptions] = useState(false);
+  const [resumePdfShareMessage, setResumePdfShareMessage] = useState("");
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [assistantMessage, setAssistantMessage] = useState("");
   const [assistantMessages, setAssistantMessages] = useState([
@@ -203,6 +206,85 @@ function App() {
         type: "",
         message: "",
       });
+    }
+  };
+
+  const trackResumeShare = (method) => {
+    fetch("http://localhost:5000/api/analytics", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        eventType: "resume_share",
+        page: "portfolio",
+        metadata: {
+          method,
+          source: "resume_section",
+        },
+      }),
+    }).catch((error) => {
+      console.error("Resume share analytics error:", error);
+    });
+  };
+
+  const handleResumePdfShare = async () => {
+    setResumePdfShareMessage("");
+
+    if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
+      setShowMoreShareOptions(true);
+      setResumePdfShareMessage(
+        "This browser cannot share files directly. Download the PDF below and attach it manually in WhatsApp, Gmail, LinkedIn, or another app."
+      );
+      return;
+    }
+
+    try {
+      const response = await fetch("/resume.pdf", { cache: "no-store" });
+
+      if (!response.ok) {
+        throw new Error("Resume PDF could not be loaded.");
+      }
+
+      const pdfBlob = await response.blob();
+      const resumeFile = new File(
+        [pdfBlob],
+        "Krishna-Sahu-Resume.pdf",
+        { type: "application/pdf" }
+      );
+
+      const shareData = {
+        files: [resumeFile],
+      };
+
+      if (
+        typeof navigator.canShare !== "function" ||
+        !navigator.canShare(shareData)
+      ) {
+        setShowMoreShareOptions(true);
+        setResumePdfShareMessage(
+          "Your current browser/device does not support direct PDF file sharing. Download the PDF below, then attach the actual file in the app you want to use."
+        );
+        return;
+      }
+
+      await navigator.share(shareData);
+
+      trackResumeShare("resume_pdf_native_share");
+      setShowMoreShareOptions(false);
+      setResumePdfShareMessage(
+        "Your resume PDF was sent to the selected sharing app."
+      );
+    } catch (error) {
+      if (error.name === "AbortError") {
+        return;
+      }
+
+      console.error("Resume PDF share error:", error);
+      setShowMoreShareOptions(true);
+      setResumePdfShareMessage(
+        "The PDF could not be shared directly on this browser/device. Download it below and attach the actual PDF manually."
+      );
     }
   };
 
@@ -1430,7 +1512,22 @@ function App() {
               </a>
 
 
-              <a href="#contact" className="resume-action">
+              <button
+                type="button"
+                className="resume-action"
+                onClick={() => {
+                  setShareResumeOpen(true);
+                  setShowMoreShareOptions(false);
+                  setResumePdfShareMessage("");
+                }}
+                style={{
+                  width: "100%",
+                  border: "none",
+                  textAlign: "left",
+                  cursor: "pointer",
+                  font: "inherit",
+                }}
+              >
 
                 <div className="action-icon">
                   <i className="bi bi-share"></i>
@@ -1441,7 +1538,7 @@ function App() {
                   <span>Share my resume</span>
                 </div>
 
-              </a>
+              </button>
 
 
               <div className="resume-quote">
@@ -1458,6 +1555,185 @@ function App() {
 
       </motion.section>
 
+
+      {/* ================= RESUME PDF SHARE MODAL ================= */}
+      {shareResumeOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="resume-share-title"
+          onClick={() => setShareResumeOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 100000,
+            backgroundColor: "rgba(0, 0, 0, 0.65)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+        >
+          <div
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "100%",
+              maxWidth: "460px",
+              borderRadius: "18px",
+              padding: "28px",
+              background: theme === "dark" ? "#111827" : "#ffffff",
+              color: theme === "dark" ? "#ffffff" : "#172033",
+              boxShadow: "0 24px 70px rgba(0,0,0,0.28)",
+              position: "relative",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setShareResumeOpen(false)}
+              aria-label="Close resume sharing"
+              style={{
+                position: "absolute",
+                top: "16px",
+                right: "16px",
+                width: "36px",
+                height: "36px",
+                border: "none",
+                borderRadius: "50%",
+                background: theme === "dark" ? "rgba(255,255,255,0.08)" : "#f1f5f9",
+                color: "inherit",
+                cursor: "pointer",
+                fontSize: "18px",
+              }}
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
+
+            <div style={{ paddingRight: "40px" }}>
+              <p className="small-label" style={{ marginBottom: "8px" }}>
+                SHARE MY RESUME
+              </p>
+
+              <h3
+                id="resume-share-title"
+                style={{
+                  marginBottom: "8px",
+                  fontWeight: 700,
+                }}
+              >
+                Share Krishna's Resume PDF
+              </h3>
+
+              <p
+                style={{
+                  marginBottom: "22px",
+                  opacity: 0.75,
+                  lineHeight: 1.6,
+                }}
+              >
+                This option shares the actual resume PDF file. It does not send your portfolio URL.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleResumePdfShare}
+              style={{
+                width: "100%",
+                padding: "15px 16px",
+                border: "none",
+                borderRadius: "10px",
+                background: theme === "dark" ? "#ffffff" : "#172033",
+                color: theme === "dark" ? "#172033" : "#ffffff",
+                cursor: "pointer",
+                fontWeight: 700,
+                fontSize: "15px",
+              }}
+            >
+              <i className="bi bi-file-earmark-pdf" style={{ marginRight: "8px" }}></i>
+              Share Actual PDF File
+            </button>
+
+            <div
+              style={{
+                marginTop: "12px",
+                padding: "12px 14px",
+                borderRadius: "10px",
+                background: theme === "dark" ? "rgba(255,255,255,0.05)" : "#f8fafc",
+                fontSize: "13px",
+                lineHeight: 1.5,
+              }}
+            >
+              <i className="bi bi-paperclip" style={{ marginRight: "7px" }}></i>
+              File: <strong>Krishna-Sahu-Resume.pdf</strong>
+            </div>
+
+            {resumePdfShareMessage && (
+              <div
+                style={{
+                  marginTop: "14px",
+                  padding: "13px 14px",
+                  borderRadius: "10px",
+                  background: theme === "dark" ? "rgba(0, 200, 255, 0.08)" : "#eff6ff",
+                  border: theme === "dark" ? "1px solid rgba(0, 200, 255, 0.18)" : "1px solid #bfdbfe",
+                  fontSize: "13px",
+                  lineHeight: 1.6,
+                }}
+              >
+                {resumePdfShareMessage}
+              </div>
+            )}
+
+            {showMoreShareOptions && (
+              <div
+                style={{
+                  marginTop: "14px",
+                  padding: "14px",
+                  borderRadius: "12px",
+                  background: theme === "dark" ? "rgba(255,255,255,0.05)" : "#f8fafc",
+                  border: theme === "dark" ? "1px solid rgba(255,255,255,0.08)" : "1px solid #e2e8f0",
+                }}
+              >
+                <p style={{ margin: "0 0 8px", fontWeight: 700 }}>
+                  Direct PDF sharing is unavailable here.
+                </p>
+
+                <p
+                  style={{
+                    margin: "0 0 12px",
+                    fontSize: "13px",
+                    lineHeight: 1.6,
+                    opacity: 0.75,
+                  }}
+                >
+                  Download the actual PDF and attach it directly in WhatsApp, Gmail, LinkedIn, or another app.
+                </p>
+
+                <a
+                  href="/resume.pdf"
+                  download="Krishna-Sahu-Resume.pdf"
+                  onClick={() => trackResumeShare("resume_pdf_download_fallback")}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    width: "100%",
+                    padding: "11px 14px",
+                    borderRadius: "9px",
+                    background: theme === "dark" ? "#ffffff" : "#172033",
+                    color: theme === "dark" ? "#172033" : "#ffffff",
+                    textDecoration: "none",
+                    fontWeight: 600,
+                  }}
+                >
+                  <i className="bi bi-download"></i>
+                  Download Resume PDF
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ================= CONTACT ================= */}
       <motion.section
