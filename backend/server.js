@@ -8,11 +8,12 @@ const nodemailer = require("nodemailer");
 
 const ContactMessage = require("./models/ContactMessage");
 const AnalyticsEvent = require("./models/AnalyticsEvent");
+const Project = require("./models/Project");
 
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "5mb" }));
 
 
 // ================= OPENAI CLIENT =================
@@ -144,8 +145,7 @@ function buildAssistantInput(message, history) {
     ? history
         .filter(
           (item) =>
-            (item.role === "user" ||
-              item.role === "assistant") &&
+            (item.role === "user" || item.role === "assistant") &&
             typeof item.content === "string"
         )
         .slice(-12)
@@ -188,22 +188,421 @@ mongoose
 // ================= TEST ROUTE =================
 
 app.get("/", (req, res) => {
-  res.send(
-    "Krishna Sahu Portfolio Backend is running!"
-  );
+  res.send("Krishna Sahu Portfolio Backend is running!");
+});
+
+
+// ================= PROJECT MANAGEMENT API =================
+
+app.get("/api/projects", async (req, res) => {
+  try {
+    const projects = await Project.find().sort({
+      featured: -1,
+      order: 1,
+      createdAt: -1
+    });
+
+    res.json({
+      success: true,
+      projects
+    });
+
+  } catch (error) {
+
+    console.log(
+      "Get projects error:",
+      error.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to load projects."
+    });
+
+  }
+});
+
+
+app.get("/api/projects/:id", async (req, res) => {
+
+  try {
+
+    const project =
+      await Project.findById(
+        req.params.id
+      );
+
+    if (!project) {
+
+      return res.status(404).json({
+        success: false,
+        message: "Project not found."
+      });
+
+    }
+
+    res.json({
+      success: true,
+      project
+    });
+
+  } catch (error) {
+
+    console.log(
+      "Get project error:",
+      error.message
+    );
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to load project."
+    });
+
+  }
+
+});
+
+
+app.post("/api/projects", async (req, res) => {
+
+  try {
+
+    const {
+      title,
+      category,
+      description,
+      image,
+      technologies,
+      details,
+      github,
+      liveDemo,
+      featured,
+      order
+    } = req.body;
+
+
+    if (
+      !title ||
+      !category ||
+      !description
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message:
+          "Title, category and description are required."
+      });
+
+    }
+
+
+    const project =
+      new Project({
+
+        title:
+          title.trim(),
+
+        category:
+          category.trim(),
+
+        description:
+          description.trim(),
+
+        image:
+          typeof image === "string"
+            ? image.trim()
+            : "",
+
+        technologies:
+          Array.isArray(technologies)
+            ? technologies
+                .map((item) =>
+                  String(item).trim()
+                )
+                .filter(Boolean)
+            : [],
+
+        details:
+          typeof details === "string"
+            ? details.trim()
+            : "",
+
+        github:
+          typeof github === "string"
+            ? github.trim()
+            : "",
+
+        liveDemo:
+          typeof liveDemo === "string"
+            ? liveDemo.trim()
+            : "",
+
+        featured:
+          Boolean(featured),
+
+        order:
+          Number.isFinite(
+            Number(order)
+          )
+            ? Number(order)
+            : 0,
+
+      });
+
+
+    await project.save();
+
+
+    res.status(201).json({
+
+      success: true,
+
+      message:
+        "Project added successfully.",
+
+      project
+
+    });
+
+
+  } catch (error) {
+
+    console.log(
+      "Add project error:",
+      error.message
+    );
+
+    res.status(500).json({
+
+      success: false,
+
+      message:
+        "Failed to add project."
+
+    });
+
+  }
+
+});
+
+
+app.put("/api/projects/:id", async (req, res) => {
+
+  try {
+
+    const {
+      title,
+      category,
+      description,
+      image,
+      technologies,
+      details,
+      github,
+      liveDemo,
+      featured,
+      order
+    } = req.body;
+
+
+    if (
+      !title ||
+      !category ||
+      !description
+    ) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message:
+          "Title, category and description are required."
+
+      });
+
+    }
+
+
+    const project =
+      await Project.findByIdAndUpdate(
+
+        req.params.id,
+
+        {
+
+          title:
+            title.trim(),
+
+          category:
+            category.trim(),
+
+          description:
+            description.trim(),
+
+          image:
+            typeof image === "string"
+              ? image.trim()
+              : "",
+
+          technologies:
+            Array.isArray(technologies)
+              ? technologies
+                  .map((item) =>
+                    String(item).trim()
+                  )
+                  .filter(Boolean)
+              : [],
+
+          details:
+            typeof details === "string"
+              ? details.trim()
+              : "",
+
+          github:
+            typeof github === "string"
+              ? github.trim()
+              : "",
+
+          liveDemo:
+            typeof liveDemo === "string"
+              ? liveDemo.trim()
+              : "",
+
+          featured:
+            Boolean(featured),
+
+          order:
+            Number.isFinite(
+              Number(order)
+            )
+              ? Number(order)
+              : 0,
+
+        },
+
+        {
+          new: true,
+          runValidators: true
+        }
+
+      );
+
+
+    if (!project) {
+
+      return res.status(404).json({
+
+        success: false,
+
+        message:
+          "Project not found."
+
+      });
+
+    }
+
+
+    res.json({
+
+      success: true,
+
+      message:
+        "Project updated successfully.",
+
+      project
+
+    });
+
+
+  } catch (error) {
+
+    console.log(
+      "Update project error:",
+      error.message
+    );
+
+    res.status(500).json({
+
+      success: false,
+
+      message:
+        "Failed to update project."
+
+    });
+
+  }
+
+});
+
+
+app.delete("/api/projects/:id", async (req, res) => {
+
+  try {
+
+    const project =
+      await Project.findByIdAndDelete(
+        req.params.id
+      );
+
+
+    if (!project) {
+
+      return res.status(404).json({
+
+        success: false,
+
+        message:
+          "Project not found."
+
+      });
+
+    }
+
+
+    res.json({
+
+      success: true,
+
+      message:
+        "Project deleted successfully.",
+
+      project
+
+    });
+
+
+  } catch (error) {
+
+    console.log(
+      "Delete project error:",
+      error.message
+    );
+
+    res.status(500).json({
+
+      success: false,
+
+      message:
+        "Failed to delete project."
+
+    });
+
+  }
+
 });
 
 
 // ================= CONTACT FORM API =================
 
 app.post("/api/contact", async (req, res) => {
+
   try {
+
     const {
       name,
       email,
       subject,
       message,
-      portfolioWebsite,
+      portfolioWebsite
     } = req.body;
 
 
@@ -213,10 +612,16 @@ app.post("/api/contact", async (req, res) => {
       typeof portfolioWebsite === "string" &&
       portfolioWebsite.trim() !== ""
     ) {
+
       return res.status(400).json({
+
         success: false,
-        message: "Unable to submit the message.",
+
+        message:
+          "Unable to submit the message."
+
       });
+
     }
 
 
@@ -228,11 +633,16 @@ app.post("/api/contact", async (req, res) => {
       !subject ||
       !message
     ) {
+
       return res.status(400).json({
+
         success: false,
+
         message:
-          "Please fill in all required fields.",
+          "Please fill in all required fields."
+
       });
+
     }
 
 
@@ -240,93 +650,83 @@ app.post("/api/contact", async (req, res) => {
 
     const newMessage =
       new ContactMessage({
-        name: name.trim(),
-        email: email.trim(),
-        subject: subject.trim(),
-        message: message.trim(),
+
+        name:
+          name.trim(),
+
+        email:
+          email.trim(),
+
+        subject:
+          subject.trim(),
+
+        message:
+          message.trim(),
+
       });
 
+
     await newMessage.save();
+
 
     console.log(
       "Contact message saved successfully."
     );
 
 
-    // ================= FAST RESPONSE =================
-
-    res.status(201).json({
-      success: true,
-      message:
-        "Message submitted successfully.",
-    });
-
-
-    // ================= SEND EMAILS IN BACKGROUND =================
+    // ================= EMAILS =================
 
     if (
       process.env.EMAIL_USER &&
       process.env.EMAIL_PASS &&
       process.env.EMAIL_TO
     ) {
-      void (async () => {
-        try {
-          const safeName =
-            escapeHtml(name.trim());
 
-          const safeEmail =
-            escapeHtml(email.trim());
+      try {
 
-          const safeSubject =
-            escapeHtml(subject.trim());
+        const safeName =
+          escapeHtml(
+            name.trim()
+          );
 
-          const safeMessage =
-            escapeHtml(
-              message.trim()
-            ).replace(
-              /\n/g,
-              "<br>"
-            );
+        const safeEmail =
+          escapeHtml(
+            email.trim()
+          );
 
-          const submittedOn =
-            new Date().toLocaleString(
-              "en-IN",
-              {
-                timeZone:
-                  "Asia/Kolkata",
+        const safeSubject =
+          escapeHtml(
+            subject.trim()
+          );
 
-                day: "2-digit",
-
-                month: "long",
-
-                year: "numeric",
-
-                hour: "2-digit",
-
-                minute: "2-digit",
-              }
-            );
+        const safeMessage =
+          escapeHtml(
+            message.trim()
+          ).replace(
+            /\n/g,
+            "<br>"
+          );
 
 
-          // =====================================================
-          // EMAIL 1 — KRISHNA NOTIFICATION
-          // =====================================================
+        // =====================================================
+        // EMAIL 1 — KRISHNA'S NOTIFICATION
+        // =====================================================
 
-          await mailTransporter.sendMail({
+        await mailTransporter.sendMail({
 
-            from:
-              `"Portfolio Website" <${process.env.EMAIL_USER}>`,
+          from:
+            `"Portfolio Website" <${process.env.EMAIL_USER}>`,
 
-            to:
-              process.env.EMAIL_TO,
+          to:
+            process.env.EMAIL_TO,
 
-            replyTo:
-              email.trim(),
+          replyTo:
+            email.trim(),
 
-            subject:
-              `Portfolio Contact: ${subject.trim()}`,
+          subject:
+            `Portfolio Contact: ${subject.trim()}`,
 
-            text: `
+          text: `
 New Portfolio Contact
 
 Someone has submitted a new message through your portfolio website.
@@ -341,11 +741,12 @@ ${message.trim()}
 You can directly reply to this email to respond to the visitor.
 
 Best regards,
-Krishna Sahu
 Portfolio Website
+Krishna Sahu Portfolio
 `,
 
-            html: `
+          html: `
+
 <!DOCTYPE html>
 
 <html>
@@ -355,37 +756,34 @@ Portfolio Website
 <meta charset="UTF-8">
 
 <meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
 >
 
-<title>
-New Portfolio Contact
-</title>
+<title>New Portfolio Contact</title>
 
 </head>
 
 
 <body
-style="
-margin:0;
-padding:0;
-background:#eef3f9;
-font-family:Arial,Helvetica,sans-serif;
-color:#14213d;
-"
+  style="
+    margin:0;
+    padding:0;
+    background:#f3f6fb;
+    font-family:Arial,Helvetica,sans-serif;
+  "
 >
 
 
 <table
-width="100%"
-cellpadding="0"
-cellspacing="0"
-border="0"
-style="
-background:#eef3f9;
-padding:24px 12px;
-"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+  style="
+    background:#f3f6fb;
+    padding:30px 15px;
+  "
 >
 
 <tr>
@@ -394,17 +792,17 @@ padding:24px 12px;
 
 
 <table
-width="100%"
-cellpadding="0"
-cellspacing="0"
-border="0"
-style="
-max-width:650px;
-background:#ffffff;
-border-radius:20px;
-overflow:hidden;
-box-shadow:0 12px 35px rgba(12,35,68,0.12);
-"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+  style="
+    max-width:650px;
+    background:#ffffff;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 8px 30px rgba(20,50,80,0.10);
+  "
 >
 
 
@@ -413,77 +811,47 @@ box-shadow:0 12px 35px rgba(12,35,68,0.12);
 <tr>
 
 <td
-align="center"
-style="
-background:#071a35;
-padding:30px 28px 32px;
-"
+  style="
+    background:#172033;
+    padding:36px 35px;
+    color:#ffffff;
+  "
 >
-
 
 <div
-style="
-font-size:20px;
-line-height:1.4;
-font-weight:700;
-letter-spacing:5px;
-color:#ffffff;
-"
->
-KRISHNA SAHU
-</div>
-
-
-<div
-style="
-font-size:11px;
-line-height:1.5;
-letter-spacing:4px;
-color:#a9bad4;
-margin-top:5px;
-"
->
-PORTFOLIO WEBSITE
-</div>
-
-
-<div
-style="
-width:84px;
-height:4px;
-background:#18d4ee;
-border-radius:10px;
-margin:18px auto 22px;
-"
->
-</div>
+  style="
+    width:36px;
+    height:4px;
+    background:#4f8cff;
+    border-radius:10px;
+    margin-bottom:18px;
+  "
+></div>
 
 
 <h1
-style="
-margin:0;
-color:#ffffff;
-font-size:30px;
-line-height:1.25;
-font-weight:700;
-"
+  style="
+    margin:0;
+    font-size:28px;
+    line-height:1.3;
+    font-weight:700;
+  "
 >
 New Portfolio Contact
 </h1>
 
 
 <p
-style="
-margin:10px auto 0;
-max-width:480px;
-color:#c6d2e4;
-font-size:15px;
-line-height:1.6;
-"
+  style="
+    margin:10px 0 0;
+    color:#b9c5d8;
+    font-size:14px;
+    line-height:1.6;
+  "
 >
-Someone has submitted a new message through your portfolio website.
+Someone has submitted a new message
+through your portfolio website.
 </p>
-
 
 </td>
 
@@ -495,23 +863,22 @@ Someone has submitted a new message through your portfolio website.
 <tr>
 
 <td
-style="
-padding:28px 26px 32px;
-background:#ffffff;
-"
+  style="
+    padding:32px 35px;
+  "
 >
 
 
 <table
-width="100%"
-cellpadding="0"
-cellspacing="0"
-border="0"
-style="
-background:#f8fbff;
-border:1px solid #e4ebf4;
-border-radius:16px;
-"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+  style="
+    background:#f8fafc;
+    border:1px solid #e5eaf1;
+    border-radius:12px;
+  "
 >
 
 
@@ -520,26 +887,22 @@ border-radius:16px;
 <tr>
 
 <td
-style="
-padding:18px 20px 10px;
-font-size:14px;
-color:#17233c;
-"
+  style="
+    padding:16px 20px 8px;
+    font-size:14px;
+    color:#182338;
+  "
 >
 
 <strong>
-👤 &nbsp; Name
+👤 &nbsp; Name:
 </strong>
 
-<br>
-
 <span
-style="
-display:block;
-margin-top:7px;
-font-size:15px;
-color:#34445c;
-"
+  style="
+    margin-left:12px;
+    color:#34445c;
+  "
 >
 ${safeName}
 </span>
@@ -554,29 +917,24 @@ ${safeName}
 <tr>
 
 <td
-style="
-padding:10px 20px;
-border-top:1px solid #e5ebf3;
-font-size:14px;
-color:#17233c;
-"
+  style="
+    padding:8px 20px;
+    font-size:14px;
+    color:#182338;
+  "
 >
 
 <strong>
-✉️ &nbsp; Email
+✉️ &nbsp; Email:
 </strong>
 
-<br>
-
 <a
-href="mailto:${safeEmail}"
-style="
-display:block;
-margin-top:7px;
-font-size:15px;
-color:#1769e0;
-text-decoration:underline;
-"
+  href="mailto:${safeEmail}"
+  style="
+    margin-left:12px;
+    color:#3678d8;
+    text-decoration:underline;
+  "
 >
 ${safeEmail}
 </a>
@@ -591,27 +949,22 @@ ${safeEmail}
 <tr>
 
 <td
-style="
-padding:10px 20px;
-border-top:1px solid #e5ebf3;
-font-size:14px;
-color:#17233c;
-"
+  style="
+    padding:8px 20px;
+    font-size:14px;
+    color:#182338;
+  "
 >
 
 <strong>
-📄 &nbsp; Subject
+📄 &nbsp; Subject:
 </strong>
 
-<br>
-
 <span
-style="
-display:block;
-margin-top:7px;
-font-size:15px;
-color:#34445c;
-"
+  style="
+    margin-left:12px;
+    color:#34445c;
+  "
 >
 ${safeSubject}
 </span>
@@ -626,174 +979,90 @@ ${safeSubject}
 <tr>
 
 <td
-style="
-padding:10px 20px 20px;
-border-top:1px solid #e5ebf3;
-font-size:14px;
-color:#17233c;
-"
+  style="
+    padding:8px 20px 20px;
+    font-size:14px;
+    color:#182338;
+  "
 >
 
 <strong>
-💬 &nbsp; Message
+💬 &nbsp; Message:
 </strong>
 
 
 <div
-style="
-margin-top:10px;
-padding:16px;
-background:#eef4fb;
-border-radius:10px;
-color:#34445c;
-font-size:15px;
-line-height:1.7;
-"
+  style="
+    margin-top:12px;
+    padding:16px;
+    background:#eef2f7;
+    border-radius:8px;
+    color:#34445c;
+    line-height:1.7;
+  "
 >
 ${safeMessage}
 </div>
 
-
 </td>
 
 </tr>
 
-
 </table>
 
 
-<div
-style="
-margin-top:20px;
-padding:15px 18px;
-background:#eaf3ff;
-border-radius:12px;
-color:#1457b8;
-font-size:14px;
-line-height:1.6;
-"
+<p
+  style="
+    margin:22px 0;
+    color:#52637a;
+    font-size:14px;
+    line-height:1.6;
+  "
 >
-✈️ &nbsp; You can directly reply to this email to respond to the visitor.
-</div>
+You can directly reply to this email
+to respond to the visitor.
+</p>
 
 
 <div
-style="
-height:1px;
-background:#dce5ef;
-margin:26px 0 20px;
-"
->
-</div>
+  style="
+    height:1px;
+    background:#dfe5ed;
+    margin:20px 0;
+  "
+></div>
 
 
-<table
-width="100%"
-cellpadding="0"
-cellspacing="0"
-border="0"
->
-
-<tr>
-
-<td
-style="
-color:#52637a;
-font-size:13px;
-line-height:1.7;
-"
+<p
+  style="
+    margin:0;
+    color:#52637a;
+    font-size:13px;
+    line-height:1.7;
+  "
 >
 
-Best regards,
-
-<br>
+Best regards,<br>
 
 <strong
-style="
-color:#172033;
-font-size:16px;
-"
+  style="
+    color:#182338;
+    font-size:14px;
+  "
 >
-Krishna Sahu
+Portfolio Website
 </strong>
 
 <br>
 
-Portfolio Website
+Krishna Sahu Portfolio
 
-</td>
-
-
-<td
-align="right"
-valign="bottom"
-style="
-color:#52637a;
-font-size:14px;
-font-style:italic;
-"
->
-
-Build &nbsp;•&nbsp; Learn &nbsp;•&nbsp; Grow
-
-</td>
-
-</tr>
-
-</table>
+</p>
 
 
 </td>
 
 </tr>
-
-
-<!-- FOOTER -->
-
-<tr>
-
-<td
-align="center"
-style="
-background:#071a35;
-padding:24px 20px;
-color:#c6d2e4;
-"
->
-
-
-<div
-style="
-width:76px;
-height:4px;
-background:#18d4ee;
-border-radius:10px;
-margin:0 auto 15px;
-"
->
-</div>
-
-
-<div
-style="
-font-size:12px;
-line-height:1.7;
-"
->
-
-© 2026 Krishna Sahu. All rights reserved.
-
-<br>
-
-Thank you for being part of this journey!
-
-</div>
-
-
-</td>
-
-</tr>
-
 
 </table>
 
@@ -803,42 +1072,42 @@ Thank you for being part of this journey!
 </tr>
 
 </table>
-
 
 </body>
 
 </html>
-`,
-          });
+
+`
+
+        });
 
 
-          console.log(
-            "Notification email sent to Krishna."
-          );
+        console.log(
+          "Notification email sent to Krishna."
+        );
 
 
-          // =====================================================
-          // EMAIL 2 — VISITOR CONFIRMATION
-          // =====================================================
+        // =====================================================
+        // EMAIL 2 — VISITOR CONFIRMATION
+        // =====================================================
 
-          await mailTransporter.sendMail({
+        await mailTransporter.sendMail({
 
-            from:
-              `"Portfolio Website" <${process.env.EMAIL_USER}>`,
+          from:
+            `"Portfolio Website" <${process.env.EMAIL_USER}>`,
 
-            to:
-              email.trim(),
+          to:
+            email.trim(),
 
-            subject:
-              "Your message has been received — Krishna Sahu",
+          subject:
+            "Your message has been received — Krishna Sahu",
 
-            text: `
+          text: `
 Thank You, ${name.trim()}!
 
 Your message has been successfully submitted through Krishna Sahu's portfolio website.
 
 Subject: ${subject.trim()}
-Submitted On: ${submittedOn}
 
 Your message has been received successfully.
 
@@ -851,7 +1120,8 @@ Portfolio Website
 Thank you for visiting my portfolio!
 `,
 
-            html: `
+          html: `
+
 <!DOCTYPE html>
 
 <html>
@@ -861,37 +1131,34 @@ Thank you for visiting my portfolio!
 <meta charset="UTF-8">
 
 <meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
 >
 
-<title>
-Message Received
-</title>
+<title>Message Received</title>
 
 </head>
 
 
 <body
-style="
-margin:0;
-padding:0;
-background:#eef3f9;
-font-family:Arial,Helvetica,sans-serif;
-color:#14213d;
-"
+  style="
+    margin:0;
+    padding:0;
+    background:#f3f6fb;
+    font-family:Arial,Helvetica,sans-serif;
+  "
 >
 
 
 <table
-width="100%"
-cellpadding="0"
-cellspacing="0"
-border="0"
-style="
-background:#eef3f9;
-padding:24px 12px;
-"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+  style="
+    background:#f3f6fb;
+    padding:30px 15px;
+  "
 >
 
 <tr>
@@ -900,17 +1167,17 @@ padding:24px 12px;
 
 
 <table
-width="100%"
-cellpadding="0"
-cellspacing="0"
-border="0"
-style="
-max-width:650px;
-background:#ffffff;
-border-radius:20px;
-overflow:hidden;
-box-shadow:0 12px 35px rgba(12,35,68,0.12);
-"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+  style="
+    max-width:650px;
+    background:#ffffff;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 8px 30px rgba(20,50,80,0.10);
+  "
 >
 
 
@@ -919,75 +1186,52 @@ box-shadow:0 12px 35px rgba(12,35,68,0.12);
 <tr>
 
 <td
-align="center"
-style="
-background:#ffffff;
-padding:30px 28px 28px;
-"
+  align="center"
+  style="
+    padding:38px 35px 20px;
+  "
 >
 
 
 <div
-style="
-font-size:20px;
-line-height:1.4;
-font-weight:700;
-letter-spacing:5px;
-color:#10234a;
-"
+  style="
+    width:62px;
+    height:62px;
+    background:#eaf1ff;
+    border-radius:50%;
+    margin:0 auto 20px;
+    text-align:center;
+    line-height:62px;
+    font-size:30px;
+  "
 >
-KRISHNA SAHU
-</div>
-
-
-<div
-style="
-font-size:11px;
-line-height:1.5;
-letter-spacing:4px;
-color:#6a7890;
-margin-top:5px;
-"
->
-PORTFOLIO WEBSITE
-</div>
-
-
-<div
-style="
-width:84px;
-height:4px;
-background:#18cfe8;
-border-radius:10px;
-margin:18px auto 22px;
-"
->
+✉️
 </div>
 
 
 <h1
-style="
-margin:0;
-color:#10234a;
-font-size:30px;
-line-height:1.3;
-font-weight:700;
-"
+  style="
+    margin:0;
+    color:#172033;
+    font-size:28px;
+    line-height:1.35;
+  "
 >
 Thank You, ${safeName}!
 </h1>
 
 
 <p
-style="
-margin:11px auto 0;
-max-width:500px;
-color:#50658b;
-font-size:15px;
-line-height:1.6;
-"
+  style="
+    margin:12px 0 0;
+    color:#52637a;
+    font-size:15px;
+    line-height:1.6;
+  "
 >
-Your message has been successfully submitted through Krishna Sahu's portfolio website.
+Your message has been successfully
+submitted through Krishna Sahu's
+portfolio website.
 </p>
 
 
@@ -996,492 +1240,163 @@ Your message has been successfully submitted through Krishna Sahu's portfolio we
 </tr>
 
 
-<!-- CONFIRMATION CARD -->
+<!-- MESSAGE CARD -->
 
 <tr>
 
 <td
-style="
-padding:8px 26px 30px;
-background:#ffffff;
-"
+  style="
+    padding:20px 35px 35px;
+  "
 >
 
 
 <table
-width="100%"
-cellpadding="0"
-cellspacing="0"
-border="0"
-style="
-background:#f1f6ff;
-border-radius:16px;
-"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+  style="
+    background:#f3f6fc;
+    border-radius:12px;
+  "
 >
 
 
 <tr>
 
 <td
-style="
-padding:24px 22px;
-"
+  style="
+    padding:22px;
+  "
 >
 
 
-<table
-width="100%"
-cellpadding="0"
-cellspacing="0"
-border="0"
+<p
+  style="
+    margin:0 0 12px;
+    color:#172033;
+    font-size:14px;
+  "
 >
 
-
-<tr>
-
-<td
-width="68"
-valign="top"
->
-
-
-<div
-style="
-width:54px;
-height:54px;
-line-height:54px;
-text-align:center;
-background:#c9f4e4;
-border-radius:50%;
-font-size:30px;
-color:#13a978;
-"
->
-✓
-</div>
-
-
-</td>
-
-
-<td valign="top">
-
-
-<strong
-style="
-display:block;
-color:#10234a;
-font-size:17px;
-line-height:1.4;
-"
->
-We've received your message
+<strong>
+📄 &nbsp; Subject:
 </strong>
 
-
 <span
-style="
-display:block;
-margin-top:6px;
-color:#50658b;
-font-size:14px;
-line-height:1.65;
-"
->
-Thank you for reaching out! Your message has been received successfully. Krishna will get back to you soon using the email address you provided.
-</span>
-
-
-</td>
-
-</tr>
-
-</table>
-
-
-<div
-style="
-height:1px;
-background:#d6e1ef;
-margin:20px 0;
-"
->
-</div>
-
-
-<table
-width="100%"
-cellpadding="0"
-cellspacing="0"
-border="0"
->
-
-
-<!-- SUBJECT -->
-
-<tr>
-
-<td
-width="68"
-valign="top"
->
-
-
-<div
-style="
-width:42px;
-height:42px;
-line-height:42px;
-text-align:center;
-background:#dceaff;
-border-radius:50%;
-font-size:20px;
-color:#1769e0;
-"
->
-▤
-</div>
-
-
-</td>
-
-
-<td
-valign="top"
-style="
-padding-bottom:15px;
-"
->
-
-
-<strong
-style="
-display:block;
-color:#10234a;
-font-size:13px;
-"
->
-Subject
-</strong>
-
-
-<span
-style="
-display:block;
-margin-top:4px;
-color:#34445c;
-font-size:14px;
-"
+  style="
+    color:#52637a;
+    margin-left:8px;
+  "
 >
 ${safeSubject}
 </span>
 
+</p>
+
+
+<p
+  style="
+    margin:0;
+    color:#52637a;
+    font-size:14px;
+    line-height:1.6;
+  "
+>
+
+<span
+  style="
+    display:inline-block;
+    margin-right:8px;
+  "
+>
+✓
+</span>
+
+Your message has been received
+successfully.
+
+</p>
+
 
 </td>
 
 </tr>
 
+</table>
 
-<!-- SUBMITTED ON -->
 
-<tr>
-
-<td
-width="68"
-valign="top"
+<p
+  style="
+    margin:22px 0;
+    color:#52637a;
+    font-size:14px;
+    line-height:1.7;
+  "
 >
+
+Krishna has received your message
+and can get back to you using the
+email address you provided.
+
+</p>
 
 
 <div
-style="
-width:42px;
-height:42px;
-line-height:42px;
-text-align:center;
-background:#eadfff;
-border-radius:50%;
-font-size:19px;
-color:#7447d8;
-"
+  style="
+    height:1px;
+    background:#dfe5ed;
+    margin:20px 0;
+  "
+></div>
+
+
+<p
+  style="
+    margin:0;
+    color:#52637a;
+    font-size:13px;
+    line-height:1.7;
+  "
 >
-◷
-</div>
 
-
-</td>
-
-
-<td valign="top">
-
+Best regards,<br>
 
 <strong
-style="
-display:block;
-color:#10234a;
-font-size:13px;
-"
+  style="
+    color:#172033;
+    font-size:14px;
+  "
 >
-Submitted On
+Krishna Sahu
 </strong>
 
-
-<span
-style="
-display:block;
-margin-top:4px;
-color:#34445c;
-font-size:14px;
-"
->
-${submittedOn}
-</span>
-
-
-</td>
-
-</tr>
-
-
-</table>
-
-
-</td>
-
-</tr>
-
-</table>
-
-
-<!-- QUOTE -->
-
-<div
-style="
-margin-top:18px;
-padding:20px;
-background:#e9faf5;
-border-radius:14px;
-text-align:center;
-color:#2d5260;
-font-size:14px;
-line-height:1.7;
-font-style:italic;
-"
->
-
-
-<span
-style="
-font-size:24px;
-color:#10a37f;
-font-weight:700;
-"
->
-“
-</span>
-
-
-Thank you for taking the time to contact me.
-
 <br>
 
-I appreciate your interest!
+Portfolio Website
 
-
-<span
-style="
-font-size:24px;
-color:#10a37f;
-font-weight:700;
-"
->
-”
-</span>
-
-
-<br>
-
-
-<strong
-style="
-display:inline-block;
-margin-top:6px;
-color:#173b71;
-font-style:normal;
-"
->
-— Krishna Sahu
-</strong>
+</p>
 
 
 <div
-style="
-width:54px;
-height:3px;
-background:#18cfe8;
-border-radius:10px;
-margin:8px auto 0;
-"
+  style="
+    margin-top:24px;
+    padding:14px;
+    background:#eef3ff;
+    border-radius:8px;
+    text-align:center;
+    color:#52637a;
+    font-size:13px;
+  "
 >
-</div>
-
-
-</div>
-
-
-<!-- BRAND VALUES -->
-
-<table
-width="100%"
-cellpadding="0"
-cellspacing="0"
-border="0"
-style="
-margin-top:22px;
-"
->
-
-
-<tr>
-
-
-<td
-align="center"
-width="33%"
-style="
-color:#173b71;
-font-size:13px;
-line-height:1.5;
-"
->
-
-
-<div
-style="
-font-size:25px;
-margin-bottom:5px;
-"
->
-▱
-</div>
-
-
-Build Ideas
-
-
-</td>
-
-
-<td
-align="center"
-width="34%"
-style="
-color:#173b71;
-font-size:13px;
-line-height:1.5;
-"
->
-
-
-<div
-style="
-font-size:25px;
-margin-bottom:5px;
-"
->
-↗
-</div>
-
-
-Learn Continuously
-
-
-</td>
-
-
-<td
-align="center"
-width="33%"
-style="
-color:#173b71;
-font-size:13px;
-line-height:1.5;
-"
->
-
-
-<div
-style="
-font-size:25px;
-margin-bottom:5px;
-"
->
-✦
-</div>
-
-
-Grow Together
-
-
-</td>
-
-
-</tr>
-
-
-</table>
-
-
-</td>
-
-</tr>
-
-
-<!-- FOOTER -->
-
-<tr>
-
-<td
-align="center"
-style="
-background:#071a35;
-padding:24px 20px;
-color:#c6d2e4;
-"
->
-
-
-<div
-style="
-width:76px;
-height:4px;
-background:#18d4ee;
-border-radius:10px;
-margin:0 auto 15px;
-"
->
-</div>
-
-
-<div
-style="
-font-size:12px;
-line-height:1.7;
-"
->
-
-© 2026 Krishna Sahu. All rights reserved.
-
-<br>
-
 Thank you for visiting my portfolio!
-
 </div>
 
 
 </td>
 
 </tr>
-
 
 </table>
 
@@ -1496,33 +1411,45 @@ Thank you for visiting my portfolio!
 </body>
 
 </html>
-`,
-          });
+
+`
+
+        });
 
 
-          console.log(
-            "Confirmation email sent to visitor."
-          );
+        console.log(
+          "Confirmation email sent to visitor."
+        );
 
 
-        } catch (emailError) {
+      } catch (emailError) {
 
-          console.log(
-            "Email sending error:",
-            emailError.message
-          );
+        console.log(
+          "Email sending error:",
+          emailError.message
+        );
 
-        }
-
-      })();
+      }
 
     } else {
 
       console.log(
-        "Email sending skipped because email configuration is missing."
+        "Email notification skipped because email configuration is missing."
       );
 
     }
+
+
+    // ================= SUCCESS RESPONSE =================
+
+    res.status(201).json({
+
+      success: true,
+
+      message:
+        "Message submitted successfully."
+
+    });
 
 
   } catch (error) {
@@ -1532,90 +1459,79 @@ Thank you for visiting my portfolio!
       error.message
     );
 
+    res.status(500).json({
 
-    if (!res.headersSent) {
+      success: false,
 
-      res.status(500).json({
-        success: false,
-        message:
-          "Unable to submit the message.",
-      });
+      message:
+        "Unable to submit the message."
 
-    }
+    });
 
   }
 
 });
 
 
-// =========================================================
-// ANALYTICS API
-// =========================================================
+// ================= ANALYTICS API =================
 
-app.post(
-  "/api/analytics",
-  async (req, res) => {
+app.post("/api/analytics", async (req, res) => {
 
-    try {
+  try {
 
-      const {
+    const {
+      eventType,
+      page,
+      metadata
+    } = req.body;
+
+
+    const analyticsEvent =
+      new AnalyticsEvent({
+
         eventType,
         page,
-        metadata,
-      } = req.body;
-
-
-      const analyticsEvent =
-        new AnalyticsEvent({
-
-          eventType,
-
-          page,
-
-          metadata,
-
-        });
-
-
-      await analyticsEvent.save();
-
-
-      res.status(201).json({
-
-        success: true,
-
-        message:
-          "Analytics event recorded.",
+        metadata
 
       });
 
 
-    } catch (error) {
-
-      console.log(
-        "Analytics error:",
-        error.message
-      );
+    await analyticsEvent.save();
 
 
-      res.status(500).json({
+    res.status(201).json({
 
-        success: false,
+      success: true,
 
-        message:
-          "Failed to record analytics event.",
+      message:
+        "Analytics event recorded."
 
-      });
+    });
 
-    }
+
+  } catch (error) {
+
+    console.log(
+      "Analytics error:",
+      error.message
+    );
+
+
+    res.status(500).json({
+
+      success: false,
+
+      message:
+        "Failed to record analytics event."
+
+    });
 
   }
-);
+
+});
 
 
-// =========================================================
-// ANALYTICS SUMMARY API
-// =========================================================
+// ================= ANALYTICS SUMMARY API =================
 
 app.get(
   "/api/analytics/summary",
@@ -1631,40 +1547,48 @@ app.get(
         resumeDownloads,
         certificateViews,
         contactSubmissions,
-        aiActionClicks,
+        aiActionClicks
       ] = await Promise.all([
 
         AnalyticsEvent.countDocuments({
-          eventType: "page_view",
+          eventType:
+            "page_view"
         }),
 
         AnalyticsEvent.countDocuments({
-          eventType: "ai_message",
+          eventType:
+            "ai_message"
         }),
 
         AnalyticsEvent.countDocuments({
-          eventType: "project_view",
+          eventType:
+            "project_view"
         }),
 
         AnalyticsEvent.countDocuments({
-          eventType: "resume_view",
+          eventType:
+            "resume_view"
         }),
 
         AnalyticsEvent.countDocuments({
-          eventType: "resume_download",
+          eventType:
+            "resume_download"
         }),
 
         AnalyticsEvent.countDocuments({
-          eventType: "certificate_view",
+          eventType:
+            "certificate_view"
         }),
 
         AnalyticsEvent.countDocuments({
-          eventType: "contact_submission",
+          eventType:
+            "contact_submission"
         }),
 
         AnalyticsEvent.countDocuments({
-          eventType: "ai_action_click",
-        }),
+          eventType:
+            "ai_action_click"
+        })
 
       ]);
 
@@ -1685,11 +1609,11 @@ app.get(
 
                 $exists: true,
 
-                $ne: "",
+                $ne: ""
 
-              },
+              }
 
-            },
+            }
 
           },
 
@@ -1703,11 +1627,11 @@ app.get(
 
               views: {
 
-                $sum: 1,
+                $sum: 1
 
-              },
+              }
 
-            },
+            }
 
           },
 
@@ -1716,16 +1640,16 @@ app.get(
 
             $sort: {
 
-              views: -1,
+              views: -1
 
-            },
+            }
 
           },
 
 
           {
 
-            $limit: 5,
+            $limit: 5
 
           },
 
@@ -1739,11 +1663,11 @@ app.get(
               project:
                 "$_id",
 
-              views: 1,
+              views: 1
 
-            },
+            }
 
-          },
+          }
 
         ]);
 
@@ -1764,11 +1688,11 @@ app.get(
 
                 $exists: true,
 
-                $ne: "",
+                $ne: ""
 
-              },
+              }
 
-            },
+            }
 
           },
 
@@ -1782,11 +1706,11 @@ app.get(
 
               clicks: {
 
-                $sum: 1,
+                $sum: 1
 
-              },
+              }
 
-            },
+            }
 
           },
 
@@ -1795,9 +1719,9 @@ app.get(
 
             $sort: {
 
-              clicks: -1,
+              clicks: -1
 
-            },
+            }
 
           },
 
@@ -1811,11 +1735,11 @@ app.get(
               action:
                 "$_id",
 
-              clicks: 1,
+              clicks: 1
 
-            },
+            }
 
-          },
+          }
 
         ]);
 
@@ -1834,16 +1758,16 @@ app.get(
                 $gte:
                   new Date(
                     Date.now() -
-                      7 *
-                        24 *
-                        60 *
-                        60 *
-                        1000
-                  ),
+                    7 *
+                    24 *
+                    60 *
+                    60 *
+                    1000
+                  )
 
-              },
+              }
 
-            },
+            }
 
           },
 
@@ -1862,24 +1786,24 @@ app.get(
                       "%Y-%m-%d",
 
                     date:
-                      "$createdAt",
+                      "$createdAt"
 
-                  },
+                  }
 
                 },
 
                 eventType:
-                  "$eventType",
+                  "$eventType"
 
               },
 
               count: {
 
-                $sum: 1,
+                $sum: 1
 
-              },
+              }
 
-            },
+            }
 
           },
 
@@ -1888,11 +1812,11 @@ app.get(
 
             $sort: {
 
-              "_id.date": 1,
+              "_id.date": 1
 
-            },
+            }
 
-          },
+          }
 
         ]);
 
@@ -1936,7 +1860,7 @@ app.get(
 
               certificateViews: 0,
 
-              contactSubmissions: 0,
+              contactSubmissions: 0
 
             };
 
@@ -2053,7 +1977,7 @@ app.get(
             "AI Messages",
 
           count:
-            aiMessages,
+            aiMessages
 
         },
 
@@ -2063,7 +1987,7 @@ app.get(
             "Project Views",
 
           count:
-            projectViews,
+            projectViews
 
         },
 
@@ -2073,7 +1997,7 @@ app.get(
             "Resume Views",
 
           count:
-            resumeViews,
+            resumeViews
 
         },
 
@@ -2083,7 +2007,7 @@ app.get(
             "Resume Downloads",
 
           count:
-            resumeDownloads,
+            resumeDownloads
 
         },
 
@@ -2093,7 +2017,7 @@ app.get(
             "Certificate Views",
 
           count:
-            certificateViews,
+            certificateViews
 
         },
 
@@ -2103,7 +2027,7 @@ app.get(
             "Contact Submissions",
 
           count:
-            contactSubmissions,
+            contactSubmissions
 
         },
 
@@ -2113,9 +2037,9 @@ app.get(
             "AI Action Clicks",
 
           count:
-            aiActionClicks,
+            aiActionClicks
 
-        },
+        }
 
       ];
 
@@ -2140,7 +2064,7 @@ app.get(
             label:
               "No interactions yet",
 
-            count: 0,
+            count: 0
 
           }
 
@@ -2154,15 +2078,15 @@ app.get(
 
           ? Number(
 
+            (
               (
-                (
-                  resumeDownloads /
-                  resumeViews
-                ) *
-                100
-              ).toFixed(1)
+                resumeDownloads /
+                resumeViews
+              ) *
+              100
+            ).toFixed(1)
 
-            )
+          )
 
           : 0;
 
@@ -2174,15 +2098,15 @@ app.get(
 
           ? Number(
 
+            (
               (
-                (
-                  contactSubmissions /
-                  pageViews
-                ) *
-                100
-              ).toFixed(1)
+                contactSubmissions /
+                pageViews
+              ) *
+              100
+            ).toFixed(1)
 
-            )
+          )
 
           : 0;
 
@@ -2194,15 +2118,15 @@ app.get(
 
           ? Number(
 
+            (
               (
-                (
-                  aiMessages /
-                  pageViews
-                ) *
-                100
-              ).toFixed(1)
+                aiMessages /
+                pageViews
+              ) *
+              100
+            ).toFixed(1)
 
-            )
+          )
 
           : 0;
 
@@ -2215,7 +2139,7 @@ app.get(
             mostPopularInteraction.label,
 
           count:
-            mostPopularInteraction.count,
+            mostPopularInteraction.count
 
         },
 
@@ -2225,7 +2149,7 @@ app.get(
           mostViewedProjects.length > 0
 
             ? mostViewedProjects[0]
-                .project
+              .project
 
             : "No project views yet",
 
@@ -2234,7 +2158,7 @@ app.get(
 
         contactConversionRate,
 
-        aiEngagementRate,
+        aiEngagementRate
 
       };
 
@@ -2270,9 +2194,9 @@ app.get(
           dailyAnalytics:
             dailyAnalyticsArray,
 
-          engagementInsights,
+          engagementInsights
 
-        },
+        }
 
       });
 
@@ -2280,8 +2204,11 @@ app.get(
     } catch (error) {
 
       console.log(
+
         "Analytics summary error:",
+
         error.message
+
       );
 
 
@@ -2290,19 +2217,18 @@ app.get(
         success: false,
 
         message:
-          "Failed to load analytics summary.",
+          "Failed to load analytics summary."
 
       });
 
     }
 
   }
+
 );
 
 
-// =========================================================
-// AI PORTFOLIO ASSISTANT API
-// =========================================================
+// ================= AI PORTFOLIO ASSISTANT API =================
 
 app.post(
   "/api/assistant",
@@ -2312,14 +2238,19 @@ app.post(
 
       const {
         message,
-        history,
+        history
       } = req.body;
 
 
       if (
+
         !message ||
-        typeof message !== "string" ||
+
+        typeof message !==
+        "string" ||
+
         !message.trim()
+
       ) {
 
         return res.status(400).json({
@@ -2327,7 +2258,7 @@ app.post(
           success: false,
 
           message:
-            "Please enter a question.",
+            "Please enter a question."
 
         });
 
@@ -2343,7 +2274,7 @@ app.post(
           success: false,
 
           message:
-            "OPENAI_API_KEY is missing in the backend .env file.",
+            "OPENAI_API_KEY is missing in the backend .env file."
 
         });
 
@@ -2358,9 +2289,12 @@ app.post(
 
           input:
             buildAssistantInput(
+
               message.trim(),
+
               history
-            ),
+
+            )
 
         });
 
@@ -2370,7 +2304,7 @@ app.post(
         success: true,
 
         reply:
-          response.output_text,
+          response.output_text
 
       });
 
@@ -2378,8 +2312,11 @@ app.post(
     } catch (error) {
 
       console.log(
+
         "AI Assistant error:",
+
         error.message
+
       );
 
 
@@ -2388,21 +2325,21 @@ app.post(
         success: false,
 
         message:
-          "Failed to get AI response.",
+          "Failed to get AI response."
 
       });
 
     }
 
   }
+
 );
 
 
-// =========================================================
-// START SERVER
-// =========================================================
+// ================= START SERVER =================
 
 const PORT = 5000;
+
 
 app.listen(
   PORT,

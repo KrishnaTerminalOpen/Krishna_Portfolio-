@@ -23,6 +23,8 @@ function App() {
     }
   ]);
   const [assistantLoading, setAssistantLoading] = useState(false);
+  const [databaseProjects, setDatabaseProjects] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
 
   // ================= STEP 4: PROJECT DETAILS STATE =================
   const [selectedProject, setSelectedProject] = useState(null);
@@ -62,7 +64,7 @@ function App() {
       return;
     }
 
-    fetch("http://localhost:5000/api/analytics", {
+    fetch("/api/analytics", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -122,8 +124,64 @@ function App() {
     }
   ];
 
+  // ================= LOAD PROJECTS FROM MONGODB =================
+  useEffect(() => {
+    const loadDatabaseProjects = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/projects");
+
+        if (!response.ok) {
+          throw new Error("Failed to load projects from database.");
+        }
+
+        const data = await response.json();
+
+        if (data.success && Array.isArray(data.projects)) {
+          const formattedProjects = data.projects.map((project) => ({
+            title: project.title,
+            category: project.category,
+            image: project.image || "",
+            description: project.description || "",
+            tags: Array.isArray(project.technologies)
+              ? project.technologies.slice(0, 2)
+              : [],
+            details: project.details || project.description || "",
+            technologies: Array.isArray(project.technologies)
+              ? project.technologies
+              : [],
+            github: project.github || "",
+            liveDemo: project.liveDemo || "",
+            featured: Boolean(project.featured),
+            order: Number(project.order) || 0,
+          }));
+
+          setDatabaseProjects(formattedProjects);
+        }
+      } catch (error) {
+        console.error("Project loading error:", error);
+      } finally {
+        setProjectsLoading(false);
+      }
+    };
+
+    loadDatabaseProjects();
+  }, []);
+
+  // Keep the existing projects and automatically add projects
+  // created from the Project Manager. If a database project has
+  // the same title as an existing project, the database version wins.
+  const combinedProjects = [
+    ...projects.filter(
+      (project) =>
+        !databaseProjects.some(
+          (databaseProject) => databaseProject.title === project.title
+        )
+    ),
+    ...databaseProjects,
+  ];
+
   // ================= FILTERED PROJECTS =================
-  const filteredProjects = projects.filter((project) => {
+  const filteredProjects = combinedProjects.filter((project) => {
 
     const matchesCategory =
       projectFilter === "All" ||
@@ -211,7 +269,7 @@ function App() {
   };
 
   const trackResumeShare = (method) => {
-    fetch("http://localhost:5000/api/analytics", {
+    fetch("/api/analytics", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -250,7 +308,7 @@ function App() {
 
 
   const handleResumeDownload = () => {
-    fetch("http://localhost:5000/api/analytics", {
+    fetch("/api/analytics", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -370,7 +428,7 @@ function App() {
     const element = document.getElementById(target);
 
     if (element) {
-      fetch("http://localhost:5000/api/analytics", {
+      fetch("/api/analytics", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -418,7 +476,7 @@ function App() {
     setAssistantLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/assistant", {
+      const response = await fetch("/api/assistant", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -444,7 +502,7 @@ function App() {
         }
       ]);
 
-      fetch("http://localhost:5000/api/analytics", {
+      fetch("/api/analytics", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -534,7 +592,7 @@ function App() {
     });
 
     try {
-      const response = await fetch("http://localhost:5000/api/contact", {
+      const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -544,7 +602,7 @@ function App() {
           email: contactForm.email.trim(),
           subject: contactForm.subject.trim(),
           message: contactForm.message.trim(),
-          website: contactForm.portfolioWebsite.trim(),
+          portfolioWebsite: contactForm.portfolioWebsite.trim(),
         }),
       });
 
@@ -561,7 +619,7 @@ function App() {
         message: "Thank you! Your message has been submitted successfully.",
       });
 
-      fetch("http://localhost:5000/api/analytics", {
+      fetch("/api/analytics", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1111,10 +1169,24 @@ function App() {
 
             </div>
 
-            <a href="#projects" className="view-all">
-              View All Projects
-              <i className="bi bi-arrow-right"></i>
-            </a>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                flexWrap: "wrap",
+              }}
+            >
+              <a href="#projects" className="view-all">
+                View All Projects
+                <i className="bi bi-arrow-right"></i>
+              </a>
+
+              <a href="/admin/projects" className="view-all">
+                <i className="bi bi-plus-lg" style={{ marginRight: "7px" }}></i>
+                Add Project
+              </a>
+            </div>
 
           </div>
 
@@ -1175,6 +1247,8 @@ function App() {
                   tags={project.tags}
                   details={project.details}
                   technologies={project.technologies}
+                  github={project.github}
+                  liveDemo={project.liveDemo}
                   onViewDetails={() => setSelectedProject(project)}
                 />
 
@@ -1500,7 +1574,7 @@ function App() {
                 rel="noreferrer"
                 className="resume-action"
                 onClick={() => {
-                  fetch("http://localhost:5000/api/analytics", {
+                  fetch("/api/analytics", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -2227,6 +2301,8 @@ function ProjectCard({
   tags,
   details,
   technologies,
+  github,
+  liveDemo,
   onViewDetails
 }) {
 
@@ -2267,7 +2343,7 @@ function ProjectCard({
               e.preventDefault();
               e.stopPropagation();
 
-              fetch("http://localhost:5000/api/analytics", {
+              fetch("/api/analytics", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -2299,7 +2375,11 @@ function ProjectCard({
             <i className="bi bi-arrow-right"></i>
           </button>
 
-          <a href="#contact">
+          <a
+            href={github || "#contact"}
+            target={github ? "_blank" : undefined}
+            rel={github ? "noreferrer" : undefined}
+          >
             View Code
             <i className="bi bi-github"></i>
           </a>
@@ -2378,7 +2458,7 @@ function Certificate({ icon, title, company, category }) {
       <a
         href="#contact"
         onClick={() => {
-          fetch("http://localhost:5000/api/analytics", {
+          fetch("/api/analytics", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
