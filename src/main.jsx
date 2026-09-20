@@ -10,23 +10,32 @@ import App from './App.jsx'
 import AnalyticsDashboard from './AnalyticsDashboard.jsx'
 import ProjectManager from './ProjectManager.jsx'
 
-const pathname = window.location.pathname
-const hash = window.location.hash
+const root = createRoot(document.getElementById('root'))
 
-const isAnalyticsPage =
-  pathname === '/analytics' || hash === '#/analytics'
+function renderApp() {
+  const pathname = window.location.pathname
+  const hash = window.location.hash
 
-const isProjectManagerPage =
-  pathname === '/admin/projects' || hash === '#/admin/projects'
+  const isAnalyticsPage =
+    pathname === '/analytics' || hash === '#/analytics'
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    {isAnalyticsPage ? (
-      <AnalyticsDashboard />
-    ) : isProjectManagerPage ? (
-      <ProjectManager />
-    ) : (
-      <App />
-    )}
-  </StrictMode>,
-)
+  const isProjectManagerPage =
+    pathname === '/admin/projects' || hash === '#/admin/projects'
+
+  root.render(
+    <StrictMode>
+      {isAnalyticsPage ? (
+        <AnalyticsDashboard />
+      ) : isProjectManagerPage ? (
+        <ProjectManager />
+      ) : (
+        <App />
+      )}
+    </StrictMode>,
+  )
+}
+
+renderApp()
+
+window.addEventListener('hashchange', renderApp)
+window.addEventListener('popstate', renderApp)
