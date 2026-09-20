@@ -8,7 +8,7 @@ const nodemailer = require("nodemailer");
 
 const ContactMessage = require("./models/ContactMessage");
 const AnalyticsEvent = require("./models/AnalyticsEvent");
-const Project = require("./models/Project");
+const Project = require("./models/project");
 
 const app = express();
 
