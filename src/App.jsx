@@ -128,7 +128,7 @@ function App() {
   useEffect(() => {
     const loadDatabaseProjects = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/projects");
+        const response = await fetch("/api/projects");
 
         if (!response.ok) {
           throw new Error("Failed to load projects from database.");
@@ -1182,7 +1182,7 @@ function App() {
                 <i className="bi bi-arrow-right"></i>
               </a>
 
-              <a href="/admin/projects" className="view-all">
+              <a href="/#/admin/projects" className="view-all">
                 <i className="bi bi-plus-lg" style={{ marginRight: "7px" }}></i>
                 Add Project
               </a>

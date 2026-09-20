@@ -11,9 +11,13 @@ import AnalyticsDashboard from './AnalyticsDashboard.jsx'
 import ProjectManager from './ProjectManager.jsx'
 
 const pathname = window.location.pathname
+const hash = window.location.hash
 
-const isAnalyticsPage = pathname === '/analytics'
-const isProjectManagerPage = pathname === '/admin/projects'
+const isAnalyticsPage =
+  pathname === '/analytics' || hash === '#/analytics'
+
+const isProjectManagerPage =
+  pathname === '/admin/projects' || hash === '#/admin/projects'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
