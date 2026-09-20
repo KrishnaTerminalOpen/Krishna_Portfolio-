@@ -12,6 +12,7 @@ function App() {
   const [shareResumeOpen, setShareResumeOpen] = useState(false);
   const [showMoreShareOptions, setShowMoreShareOptions] = useState(false);
   const [resumePdfShareMessage, setResumePdfShareMessage] = useState("");
+  const [resumePdfLinkCopied, setResumePdfLinkCopied] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [assistantMessage, setAssistantMessage] = useState("");
   const [assistantMessages, setAssistantMessages] = useState([
@@ -225,6 +226,54 @@ function App() {
       }),
     }).catch((error) => {
       console.error("Resume share analytics error:", error);
+    });
+  };
+
+  const resumePdfUrl = `${window.location.origin}/resume.pdf`;
+
+  const handleCopyResumePdfLink = async () => {
+    try {
+      await navigator.clipboard.writeText(resumePdfUrl);
+      setResumePdfLinkCopied(true);
+      trackResumeShare("resume_pdf_link_copy");
+
+      setTimeout(() => {
+        setResumePdfLinkCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Resume PDF link copy error:", error);
+      setResumePdfShareMessage(
+        "The link could not be copied automatically. Please select and copy the PDF link manually."
+      );
+    }
+  };
+
+
+  const handleResumeDownload = () => {
+    const downloadLink = document.createElement("a");
+
+    downloadLink.href = "/resume.pdf";
+    downloadLink.download = "Krishna-Sahu-Resume.pdf";
+    downloadLink.rel = "noopener noreferrer";
+
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+
+    fetch("http://localhost:5000/api/analytics", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        eventType: "resume_download",
+        page: "portfolio",
+        metadata: {
+          source: "resume_section",
+        },
+      }),
+    }).catch((error) => {
+      console.error("Resume analytics error:", error);
     });
   };
 
@@ -1483,20 +1532,16 @@ function App() {
               </a>
 
 
-              <a
-                href="/resume.pdf"
-                download
+              <button
+                type="button"
                 className="resume-action"
-                onClick={() => {
-                  fetch("http://localhost:5000/api/analytics", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      eventType: "resume_download",
-                      page: "portfolio",
-                      metadata: { source: "resume_section" },
-                    }),
-                  }).catch((error) => console.error("Resume analytics error:", error));
+                onClick={handleResumeDownload}
+                style={{
+                  width: "100%",
+                  border: "none",
+                  textAlign: "left",
+                  cursor: "pointer",
+                  font: "inherit",
                 }}
               >
 
@@ -1509,7 +1554,7 @@ function App() {
                   <span>Get a copy for offline use</span>
                 </div>
 
-              </a>
+              </button>
 
 
               <button
@@ -1519,6 +1564,7 @@ function App() {
                   setShareResumeOpen(true);
                   setShowMoreShareOptions(false);
                   setResumePdfShareMessage("");
+                  setResumePdfLinkCopied(false);
                 }}
                 style={{
                   width: "100%",
@@ -1667,6 +1713,86 @@ function App() {
               File: <strong>Krishna-Sahu-Resume.pdf</strong>
             </div>
 
+            <div style={{ marginTop: "18px" }}>
+              <p
+                style={{
+                  margin: "0 0 8px",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                }}
+              >
+                Direct PDF Link
+              </p>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "stretch",
+                  width: "100%",
+                  borderRadius: "10px",
+                  overflow: "hidden",
+                  border:
+                    theme === "dark"
+                      ? "1px solid rgba(255,255,255,0.12)"
+                      : "1px solid #dbe3ee",
+                  background: theme === "dark" ? "rgba(255,255,255,0.04)" : "#f8fafc",
+                }}
+              >
+                <input
+                  type="text"
+                  value={resumePdfUrl}
+                  readOnly
+                  aria-label="Direct resume PDF link"
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    color: "inherit",
+                    padding: "11px 12px",
+                    fontSize: "12px",
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={handleCopyResumePdfLink}
+                  style={{
+                    flexShrink: 0,
+                    border: "none",
+                    borderLeft:
+                      theme === "dark"
+                        ? "1px solid rgba(255,255,255,0.12)"
+                        : "1px solid #dbe3ee",
+                    background: theme === "dark" ? "#ffffff" : "#172033",
+                    color: theme === "dark" ? "#172033" : "#ffffff",
+                    padding: "0 16px",
+                    cursor: "pointer",
+                    fontWeight: 700,
+                    fontSize: "13px",
+                  }}
+                >
+                  <i
+                    className={resumePdfLinkCopied ? "bi bi-check-lg" : "bi bi-copy"}
+                    style={{ marginRight: "6px" }}
+                  ></i>
+                  {resumePdfLinkCopied ? "Copied" : "Copy"}
+                </button>
+              </div>
+
+              <p
+                style={{
+                  margin: "8px 0 0",
+                  fontSize: "12px",
+                  lineHeight: 1.5,
+                  opacity: 0.65,
+                }}
+              >
+                You can copy this link and paste it into any browser to open the resume PDF directly.
+              </p>
+            </div>
+
             {resumePdfShareMessage && (
               <div
                 style={{
@@ -1708,10 +1834,12 @@ function App() {
                   Download the actual PDF and attach it directly in WhatsApp, Gmail, LinkedIn, or another app.
                 </p>
 
-                <a
-                  href="/resume.pdf"
-                  download="Krishna-Sahu-Resume.pdf"
-                  onClick={() => trackResumeShare("resume_pdf_download_fallback")}
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackResumeShare("resume_pdf_download_fallback");
+                    handleResumeDownload();
+                  }}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -1719,16 +1847,18 @@ function App() {
                     gap: "8px",
                     width: "100%",
                     padding: "11px 14px",
+                    border: "none",
                     borderRadius: "9px",
                     background: theme === "dark" ? "#ffffff" : "#172033",
                     color: theme === "dark" ? "#172033" : "#ffffff",
-                    textDecoration: "none",
+                    cursor: "pointer",
                     fontWeight: 600,
+                    fontSize: "14px",
                   }}
                 >
                   <i className="bi bi-download"></i>
                   Download Resume PDF
-                </a>
+                </button>
               </div>
             )}
           </div>
