@@ -266,7 +266,7 @@ function App() {
       console.error("Resume analytics error:", error);
     });
 
-    window.location.href = "/api/download-resume";
+    window.location.href = "/resume-download.pdf";
   };
 
   const handleResumePdfShare = async () => {

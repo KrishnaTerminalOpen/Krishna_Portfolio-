@@ -1,29 +1,39 @@
 {
-    "services": {
-        "frontend": {
-            "root": ".",
-            "framework": "vite"
-        },
-        "backend": {
-            "root": "backend",
-            "entrypoint": "server.js"
-        }
+  "services": {
+    "frontend": {
+      "root": ".",
+      "framework": "vite"
     },
-    "rewrites": [
+    "backend": {
+      "root": "backend",
+      "entrypoint": "server.js"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "frontend"
+      }
+    }
+  ],
+  "headers": [
+    {
+      "source": "/resume-download.pdf",
+      "headers": [
         {
-            "source": "/api(/.*)?",
-            "destination": {
-                "type": "service",
-                "service": "backend"
-            }
-        },
-        {
-            "source": "/(.*)",
-            "destination": {
-                "type": "service",
-                "service": "frontend"
-            }
+          "key": "Content-Disposition",
+          "value": "attachment; filename=\"Krishna-Sahu-Resume.pdf\""
         }
-    ]
+      ]
+    }
+  ]
 }
-
