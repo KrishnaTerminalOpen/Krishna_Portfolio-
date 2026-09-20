@@ -250,16 +250,6 @@ function App() {
 
 
   const handleResumeDownload = () => {
-    const downloadLink = document.createElement("a");
-
-    downloadLink.href = "/resume.pdf";
-    downloadLink.download = "Krishna-Sahu-Resume.pdf";
-    downloadLink.rel = "noopener noreferrer";
-
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-
     fetch("http://localhost:5000/api/analytics", {
       method: "POST",
       headers: {
@@ -275,6 +265,8 @@ function App() {
     }).catch((error) => {
       console.error("Resume analytics error:", error);
     });
+
+    window.location.href = "/api/download-resume";
   };
 
   const handleResumePdfShare = async () => {
