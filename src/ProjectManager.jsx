@@ -36,7 +36,7 @@ function ProjectManager() {
       setError("");
 
       const response = await fetch(
-        "http://localhost:5000/api/projects"
+        "/api/projects"
       );
 
       const data = await response.json();
@@ -277,8 +277,8 @@ function ProjectManager() {
       };
 
       const url = editingId
-        ? `http://localhost:5000/api/projects/${editingId}`
-        : "http://localhost:5000/api/projects";
+        ? `/api/projects/${editingId}`
+        : "/api/projects";
 
       const method = editingId
         ? "PUT"
@@ -428,7 +428,7 @@ function ProjectManager() {
 
       const response =
         await fetch(
-          `http://localhost:5000/api/projects/${projectId}`,
+          `/api/projects/${projectId}`,
           {
             method: "DELETE",
           }
