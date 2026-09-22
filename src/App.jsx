@@ -185,7 +185,7 @@ function App() {
 
     const matchesCategory =
       projectFilter === "All" ||
-      project.category === projectFilter;
+      (project.category && project.category.toLowerCase() === projectFilter.toLowerCase());
 
     const searchText = projectSearch.toLowerCase();
 
