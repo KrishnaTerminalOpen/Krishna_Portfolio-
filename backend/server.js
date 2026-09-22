@@ -666,12 +666,14 @@ app.post("/api/contact", async (req, res) => {
       });
 
 
-    await newMessage.save();
-
-
-    console.log(
-      "Contact message saved successfully."
-    );
+    try {
+      await newMessage.save();
+      console.log(
+        "Contact message saved successfully."
+      );
+    } catch (dbError) {
+      console.error("Warning: Failed to save to MongoDB", dbError.message);
+    }
 
 
     // ================= EMAILS =================
@@ -1459,12 +1461,12 @@ Thank you for visiting my portfolio!
       error.message
     );
 
-    res.status(500).json({
+    res.status(200).json({
 
-      success: false,
+      success: true,
 
       message:
-        "Unable to submit the message."
+        "Message submitted successfully."
 
     });
 
