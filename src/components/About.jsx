@@ -20,7 +20,7 @@ function About() {
             </h2>
 
             <p className="about-text">
-              I'm Krishna, a final year B.Tech student with a strong
+              I'm Krishna, an MCA student at MIT Manipal (Manipal University, Karnataka) and a B.Sc IT graduate with a strong
               interest in Data Science, Machine Learning and real-world
               problem solving. I enjoy exploring data, finding meaningful
               patterns and building solutions that create value.

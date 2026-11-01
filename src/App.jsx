@@ -961,7 +961,7 @@ function App() {
             </h2>
 
             <p>
-              I'm Krishna Sahu, a Computer Science student with a
+              I'm Krishna Sahu, an MCA student at MIT Manipal (Manipal University, Karnataka) and a B.Sc IT graduate with a
               strong interest in Data Science, Machine Learning and AI.
               I enjoy exploring data, finding patterns and building
               solutions that create real impact.
@@ -984,11 +984,11 @@ function App() {
             <div className="about-orbit"></div>
 
             <div className="about-chip about-chip-1">
-              <i className="bi bi-geo-alt-fill"></i> Bangalore, India
+              <i className="bi bi-geo-alt-fill"></i> Manipal, Karnataka
             </div>
 
             <div className="about-chip about-chip-2">
-              <i className="bi bi-mortarboard-fill"></i> B.Tech CSE
+              <i className="bi bi-mortarboard-fill"></i> MCA Student
             </div>
 
             <div className="about-profile-card">
@@ -1019,12 +1019,12 @@ function App() {
 
                 <div>
                   <i className="bi bi-geo-alt"></i>
-                  Bangalore, India
+                  Manipal, Karnataka
                 </div>
 
                 <div>
                   <i className="bi bi-mortarboard"></i>
-                  Dayananda Sagar University
+                  MIT Manipal, Manipal University Karnataka
                 </div>
 
                 <div>
@@ -1092,7 +1092,7 @@ function App() {
               </div>
               <div>
                 <b>Education</b>
-                <span>B.Tech CSE</span>
+                <span>MCA (MIT Manipal) | B.Sc IT Graduate</span>
               </div>
             </div>
 
@@ -1102,7 +1102,7 @@ function App() {
               </div>
               <div>
                 <b>Location</b>
-                <span>Bangalore, India</span>
+                <span>Manipal, Karnataka, India</span>
               </div>
             </div>
 
@@ -1493,13 +1493,24 @@ function App() {
             />
 
             <TimelineItem
-              date="2023 – Present"
-              title="B.Tech in Computer Science"
-              subtitle="Dayananda Sagar University"
+              date="2024 – Present"
+              title="Master of Computer Applications (MCA)"
+              subtitle="MIT Manipal, Manipal University Karnataka"
               icon="bi-mortarboard"
               points={[
-                "Learning core CS subjects and data science tools.",
-                "Actively building projects and exploring new technologies."
+                "Currently pursuing MCA with a focus on advanced computer applications, AI/ML, and data science.",
+                "Actively building intelligent solutions, full-stack systems, and exploring modern technologies."
+              ]}
+            />
+
+            <TimelineItem
+              date="Completed"
+              title="B.Sc in Information Technology (B.Sc IT)"
+              subtitle="Passout Graduate"
+              icon="bi-mortarboard"
+              points={[
+                "Graduated with a strong foundation in Information Technology, software development, database systems, and networking.",
+                "Completed multiple academic projects and gained practical problem-solving skills."
               ]}
             />
 
@@ -2034,7 +2045,7 @@ function App() {
                 <ContactItem
                   icon="bi-geo-alt-fill"
                   title="Location"
-                  text="Bangalore, India"
+                  text="Manipal, Karnataka, India"
                 />
 
               </div>

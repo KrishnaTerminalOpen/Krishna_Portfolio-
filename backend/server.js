@@ -65,10 +65,10 @@ Name:
 Krishna Sahu
 
 Education:
-B.Tech CSE
+MCA Student at MIT Manipal (Manipal University, Karnataka) | B.Sc IT Graduate
 
 Location:
-Bangalore, India
+Manipal, Karnataka, India
 
 Professional focus:
 Aspiring Data Scientist | AI/ML Enthusiast
@@ -80,7 +80,7 @@ Goal:
 To build intelligent solutions and grow continuously.
 
 About:
-Krishna is a Computer Science student with a strong interest in Data Science, Machine Learning and AI. He enjoys exploring data, finding patterns and building solutions that create real impact. He is constantly learning, building projects and looking for opportunities to grow in AI and Data Science.
+Krishna is an MCA student at MIT Manipal (Manipal University, Karnataka) and a B.Sc IT graduate with a strong interest in Data Science, Machine Learning and AI. He enjoys exploring data, finding patterns and building solutions that create real impact. He is constantly learning, building projects and looking for opportunities to grow in AI and Data Science.
 
 SKILLS:
 - Python — 90%
