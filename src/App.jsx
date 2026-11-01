@@ -887,32 +887,34 @@ function App() {
                   krishna@portfolio:~/data-science
                 </div>
 
-                <div className="hero-card-status">
-                  <span className="live-dot"></span> Live Model
-                </div>
-
               </div>
 
-              <div className="hero-card-image-wrap">
-                <img
-                  src="/data-science-hero.jpg"
-                  alt="Real-time ML & Data Science Architecture Dashboard"
-                  className="hero-dashboard-img"
-                  loading="eager"
-                />
-                <div className="hero-img-overlay"></div>
+              <div className="hero-code"></div>
+              <div className="hero-code"></div>
+              <div className="hero-code"></div>
+              <div className="hero-code"></div>
+              <div className="hero-code"></div>
+
+              <div className="hero-chart">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
               </div>
 
               <div className="hero-kpis">
 
                 <div className="hero-kpi">
-                  <span>Model Accuracy</span>
-                  <strong>94.2%</strong>
+                  <span>Accuracy</span>
+                  <strong>96.4%</strong>
                 </div>
 
                 <div className="hero-kpi">
-                  <span>Confidence</span>
-                  <strong>88.5%</strong>
+                  <span>Models Built</span>
+                  <strong>12+</strong>
                 </div>
 
               </div>

@@ -800,13 +800,13 @@ img { max-width: 100%; display: block; }
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 430px;
+  max-width: 400px;
   background: var(--glass);
   backdrop-filter: blur(24px) saturate(1.5);
   -webkit-backdrop-filter: blur(24px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-xl);
-  padding: 22px;
+  padding: 24px;
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.5),
     0 1px 0 rgba(255, 255, 255, 0.1) inset,
@@ -823,9 +823,9 @@ img { max-width: 100%; display: block; }
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 18px;
 }
 
 .hero-card-dots { display: flex; gap: 6px; }
@@ -840,77 +840,63 @@ img { max-width: 100%; display: block; }
 .hero-card-dots span:nth-child(3) { background: #28c840; }
 
 .hero-card-title {
-  margin-left: 6px;
+  margin-left: 8px;
   font-size: 11px;
   color: var(--muted);
   font-family: 'Space Grotesk', monospace;
-  letter-spacing: 0.3px;
 }
 
-.hero-card-status {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  color: #22d3ee;
-  background: rgba(34, 211, 238, 0.12);
-  border: 1px solid rgba(34, 211, 238, 0.3);
-  border-radius: 999px;
-  padding: 3px 9px;
-  letter-spacing: 0.5px;
+.hero-code {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg,
+    rgba(124, 92, 255, 0.45),
+    rgba(34, 211, 238, 0.25));
+  margin-bottom: 10px;
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
 }
 
-.hero-card-status .live-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #22d3ee;
-  box-shadow: 0 0 8px #22d3ee;
-  animation: pulseDot 2s ease-in-out infinite;
+.hero-code:nth-of-type(1) { width: 78%; }
+.hero-code:nth-of-type(2) { width: 52%; animation-delay: 0.2s; }
+.hero-code:nth-of-type(3) { width: 88%; animation-delay: 0.4s; }
+.hero-code:nth-of-type(4) { width: 40%; animation-delay: 0.6s; }
+.hero-code:nth-of-type(5) { width: 62%; animation-delay: 0.8s; }
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; opacity: 0.75; }
+  50% { background-position: 100% 50%; opacity: 1; }
 }
 
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.35; transform: scale(0.85); }
+.hero-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 100px;
+  margin-top: 22px;
+  padding: 0 2px;
 }
 
-.hero-card-image-wrap {
-  position: relative;
-  width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid rgba(124, 92, 255, 0.3);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 35px rgba(124, 92, 255, 0.2);
-  transition: all 0.4s ease;
+.hero-chart span {
+  flex: 1;
+  background: var(--gradient);
+  border-radius: 6px 6px 2px 2px;
+  box-shadow: 0 0 14px rgba(124, 92, 255, 0.4);
+  animation: barBreathe 2.6s ease-in-out infinite;
+  transform-origin: bottom;
 }
 
-.hero-card-image-wrap:hover {
-  border-color: rgba(34, 211, 238, 0.5);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6), 0 0 45px rgba(34, 211, 238, 0.3);
-}
+.hero-chart span:nth-child(1) { height: 40%; }
+.hero-chart span:nth-child(2) { height: 68%; animation-delay: 0.15s; }
+.hero-chart span:nth-child(3) { height: 48%; animation-delay: 0.3s; }
+.hero-chart span:nth-child(4) { height: 82%; animation-delay: 0.45s; }
+.hero-chart span:nth-child(5) { height: 60%; animation-delay: 0.6s; }
+.hero-chart span:nth-child(6) { height: 92%; animation-delay: 0.75s; }
+.hero-chart span:nth-child(7) { height: 72%; animation-delay: 0.9s; }
 
-.hero-dashboard-img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  display: block;
-  object-fit: cover;
-  border-radius: 15px;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.hero-card-image-wrap:hover .hero-dashboard-img {
-  transform: scale(1.025);
-}
-
-.hero-img-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 40%, rgba(10, 15, 29, 0.25) 100%);
-  border-radius: 15px;
+@keyframes barBreathe {
+  0%, 100% { transform: scaleY(1); opacity: 0.9; }
+  50% { transform: scaleY(1.12); opacity: 1; }
 }
 
 .hero-kpis {
