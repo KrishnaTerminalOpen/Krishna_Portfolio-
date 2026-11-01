@@ -50,10 +50,31 @@ function App() {
     () => localStorage.getItem("portfolio-theme") || "dark"
   );
 
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("portfolio-theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollTop;
+      const windowHeight =
+        document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scroll = windowHeight > 0 ? (totalScroll / windowHeight) * 100 : 0;
+      setScrollProgress(scroll);
+      setShowBackToTop(totalScroll > 350);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     const analyticsRecorded = sessionStorage.getItem(
@@ -451,10 +472,8 @@ function App() {
     }
   };
 
-  const handleAssistantSubmit = async (event) => {
-    event.preventDefault();
-
-    const message = assistantMessage.trim();
+  const sendAiMessage = async (rawMessage) => {
+    const message = (rawMessage || "").trim();
 
     if (!message || assistantLoading) {
       return;
@@ -531,6 +550,13 @@ function App() {
     } finally {
       setAssistantLoading(false);
     }
+  };
+
+  const handleAssistantSubmit = async (event) => {
+    if (event) {
+      event.preventDefault();
+    }
+    await sendAiMessage(assistantMessage);
   };
 
   const validateContactForm = () => {
@@ -657,6 +683,13 @@ function App() {
 
   return (
     <>
+      {/* ================= SCROLL PROGRESS BAR ================= */}
+      <div
+        className="scroll-progress-bar"
+        style={{ width: `${scrollProgress}%` }}
+        aria-hidden="true"
+      />
+
       {/* ================= NAVBAR ================= */}
       <nav className="portfolio-navbar navbar navbar-expand-lg">
 
@@ -718,8 +751,8 @@ function App() {
               <i className={`bi ${theme === "light" ? "bi-moon-stars" : "bi-sun"}`}></i>
             </button>
 
-            <a href="/resume.pdf" className="nav-resume">
-              Download Resume
+            <a href="/resume.pdf" className="nav-resume" download>
+              <span>Download Resume</span>
               <i className="bi bi-arrow-right"></i>
             </a>
 
@@ -743,6 +776,13 @@ function App() {
 
           <div className="hero-left">
 
+            <div className="hero-status-pill">
+              <span className="status-dot">
+                <span className="status-dot-ping"></span>
+              </span>
+              <span>Available for New Roles & Opportunities</span>
+            </div>
+
             <p className="small-label">HELLO, I'M</p>
 
             <h1>
@@ -763,12 +803,17 @@ function App() {
             <div className="hero-buttons">
 
               <a href="#projects" className="dark-button">
-                View My Work
+                <span>View My Work</span>
                 <i className="bi bi-arrow-right"></i>
               </a>
 
-              <a href="/resume.pdf" className="outline-button">
-                Download Resume
+              <a href="#contact" className="outline-button">
+                <span>Let's Connect</span>
+                <i className="bi bi-chat-dots-fill"></i>
+              </a>
+
+              <a href="/resume.pdf" className="outline-button resume-button" download>
+                <span>Resume</span>
                 <i className="bi bi-download"></i>
               </a>
 
@@ -2190,6 +2235,30 @@ function App() {
 
             </div>
 
+            <div className="ai-suggestions">
+              <button
+                type="button"
+                className="ai-suggestion-chip"
+                onClick={() => sendAiMessage("What are Krishna's top technical skills?")}
+              >
+                🛠️ Skills
+              </button>
+              <button
+                type="button"
+                className="ai-suggestion-chip"
+                onClick={() => sendAiMessage("Tell me about the machine learning projects.")}
+              >
+                🤖 ML Projects
+              </button>
+              <button
+                type="button"
+                className="ai-suggestion-chip"
+                onClick={() => sendAiMessage("How can I contact Krishna?")}
+              >
+                📬 Contact Info
+              </button>
+            </div>
+
             <form className="ai-chat-input" onSubmit={handleAssistantSubmit}>
 
               <input
@@ -2215,11 +2284,22 @@ function App() {
           onClick={() => setAssistantOpen((open) => !open)}
           aria-label="Open AI portfolio assistant"
         >
+          <span className="ai-ping-ring" aria-hidden="true"></span>
           <i className={assistantOpen ? "bi bi-x-lg" : "bi bi-robot"}></i>
           <span>{assistantOpen ? "Close" : "AI Assistant"}</span>
         </button>
 
       </div>
+
+      {/* ================= BACK TO TOP BUTTON ================= */}
+      <button
+        type="button"
+        className={`back-to-top-button ${showBackToTop ? "visible" : ""}`}
+        onClick={scrollToTop}
+        aria-label="Back to top"
+      >
+        <i className="bi bi-chevron-up"></i>
+      </button>
 
 
       {/* ================= FOOTER ================= */}
@@ -2347,6 +2427,7 @@ function ProjectCard({
 
           <button
             type="button"
+            className="project-btn-details"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -2369,27 +2450,35 @@ function ProjectCard({
                 tags,
                 details,
                 technologies,
+                github,
+                liveDemo,
               });
             }}
-            style={{
-              border: "none",
-              background: "transparent",
-              padding: 0,
-              cursor: "pointer",
-              font: "inherit",
-            }}
           >
-            View Details
+            <span>Details</span>
             <i className="bi bi-arrow-right"></i>
           </button>
+
+          {liveDemo && (
+            <a
+              href={liveDemo}
+              target="_blank"
+              rel="noreferrer"
+              className="project-btn-demo"
+            >
+              <span>Demo</span>
+              <i className="bi bi-box-arrow-up-right"></i>
+            </a>
+          )}
 
           <a
             href={github || "#contact"}
             target={github ? "_blank" : undefined}
             rel={github ? "noreferrer" : undefined}
+            className="project-btn-code"
           >
-            View Code
             <i className="bi bi-github"></i>
+            <span>{github ? "Code" : "Request"}</span>
           </a>
 
         </div>
@@ -2465,6 +2554,7 @@ function Certificate({ icon, title, company, category }) {
 
       <a
         href="#contact"
+        className="certificate-link"
         onClick={() => {
           fetch("/api/analytics", {
             method: "POST",
@@ -2477,7 +2567,7 @@ function Certificate({ icon, title, company, category }) {
           }).catch((error) => console.error("Certificate analytics error:", error));
         }}
       >
-        View Certificate
+        <span>View Credential</span>
         <i className="bi bi-arrow-up-right"></i>
       </a>
 

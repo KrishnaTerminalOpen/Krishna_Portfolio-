@@ -1,7 +1,7 @@
 /* =========================================================
-   GLOBAL RESET + BASE
+   GLOBAL RESET + BASE & AMBIENT AESTHETICS
 ========================================================= */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap');
 
 * {
   margin: 0;
@@ -14,19 +14,60 @@ html {
   overflow-x: hidden;
 }
 
+::selection {
+  background: rgba(124, 92, 255, 0.45);
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(124, 92, 255, 0.8);
+}
+
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0a0e1a;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #070a14;
   color: #e6ecf5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   width: 100%;
+  position: relative;
+}
+
+/* Ambient cyber subtle grid overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080c18;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #7c5cff, #22d3ee);
+  border-radius: 999px;
+  border: 2px solid #080c18;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #906ffa, #38e1fc);
 }
 
 a {
   text-decoration: none;
   color: inherit;
+  transition: all 0.25s ease;
 }
 
 img {
