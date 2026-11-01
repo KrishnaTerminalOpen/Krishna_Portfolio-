@@ -751,10 +751,7 @@ function App() {
               <i className={`bi ${theme === "light" ? "bi-moon-stars" : "bi-sun"}`}></i>
             </button>
 
-            <a href="/resume.pdf" className="nav-resume" download>
-              <span>Download Resume</span>
-              <i className="bi bi-arrow-right"></i>
-            </a>
+
 
           </div>
 
@@ -812,10 +809,7 @@ function App() {
                 <i className="bi bi-chat-dots-fill"></i>
               </a>
 
-              <a href="/resume.pdf" className="outline-button resume-button" download>
-                <span>Resume</span>
-                <i className="bi bi-download"></i>
-              </a>
+
 
             </div>
 
