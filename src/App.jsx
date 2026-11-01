@@ -830,10 +830,6 @@ function App() {
               </a>
 
               <a href="#">
-                <i className="bi bi-youtube"></i>
-              </a>
-
-              <a href="#">
                 <i className="bi bi-instagram"></i>
               </a>
 
@@ -2334,7 +2330,6 @@ function App() {
           <i className="bi bi-linkedin"></i>
           <i className="bi bi-github"></i>
           <i className="bi bi-instagram"></i>
-          <i className="bi bi-youtube"></i>
           <i className="bi bi-envelope"></i>
         </div>
 

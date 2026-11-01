@@ -681,11 +681,6 @@ img { max-width: 100%; display: block; }
   box-shadow: 0 8px 24px rgba(168, 85, 247, 0.5);
 }
 
-.social-icons a:has(.bi-youtube):hover {
-  border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.2);
-  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.5);
-}
 
 .social-icons a:has(.bi-instagram):hover {
   border-color: #ec4899;
