@@ -26,6 +26,24 @@ function App() {
   const [databaseProjects, setDatabaseProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
 
+  // ================= DYNAMIC HERO ROLES & TERMINAL TABS =================
+  const dynamicRoles = [
+    "Aspiring Data Scientist",
+    "Machine Learning Enthusiast",
+    "Python & SQL Specialist",
+    "MCA Student @ MIT Manipal",
+    "AI Systems Builder"
+  ];
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [activeHeroTab, setActiveHeroTab] = useState("train");
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRoleIndex((prev) => (prev + 1) % dynamicRoles.length);
+    }, 2800);
+    return () => clearInterval(timer);
+  }, [dynamicRoles.length]);
+
   // ================= STEP 4: PROJECT DETAILS STATE =================
   const [selectedProject, setSelectedProject] = useState(null);
 
@@ -235,18 +253,17 @@ function App() {
 
   // ================= SKILLS DATA =================
   const skills = [
-    { name: "Python", category: "Programming", icon: "bi-code-slash", percent: "90%" },
-    { name: "Java", category: "Programming", icon: "bi-cup-hot", percent: "80%" },
-    { name: "SQL", category: "Data Analysis", icon: "bi-database", percent: "85%" },
-    { name: "HTML", category: "Web Development", icon: "bi-filetype-html", percent: "85%" },
-    { name: "CSS", category: "Web Development", icon: "bi-filetype-css", percent: "85%" },
-    { name: "JavaScript", category: "Web Development", icon: "bi-filetype-js", percent: "75%" },
-    { name: "Figma", category: "Other Technologies", icon: "bi-bezier2", percent: "80%" },
-    { name: "MySQL", category: "Other Technologies", icon: "bi-database-fill", percent: "80%" },
-    { name: "NumPy", category: "Data Analysis", icon: "bi-box", percent: "80%" },
-    { name: "Machine Learning", category: "Machine Learning", icon: "bi-robot", percent: "85%" },
-    { name: "Power BI", category: "Data Analysis", icon: "bi-bar-chart-fill", percent: "80%" },
-    { name: "Git & GitHub", category: "Other Technologies", icon: "bi-github", percent: "85%" }
+    { name: "Python", category: "Programming", icon: "bi-code-slash", percent: "90%", level: "Advanced", tag: "AI, ML & Pandas" },
+    { name: "Machine Learning", category: "Machine Learning", icon: "bi-robot", percent: "85%", level: "Advanced", tag: "Supervised & Deep Learning" },
+    { name: "SQL", category: "Data Analysis", icon: "bi-database", percent: "85%", level: "Advanced", tag: "Complex Queries & Joins" },
+    { name: "Power BI", category: "Data Analysis", icon: "bi-bar-chart-fill", percent: "80%", level: "Proficient", tag: "DAX & Dashboards" },
+    { name: "NumPy & Pandas", category: "Data Analysis", icon: "bi-box", percent: "85%", level: "Advanced", tag: "Data Wrangling & Analysis" },
+    { name: "Java", category: "Programming", icon: "bi-cup-hot", percent: "80%", level: "Proficient", tag: "OOP & Data Structures" },
+    { name: "MySQL", category: "Other Technologies", icon: "bi-database-fill", percent: "80%", level: "Proficient", tag: "Relational Schemas" },
+    { name: "HTML & CSS", category: "Web Development", icon: "bi-filetype-html", percent: "85%", level: "Advanced", tag: "Modern Responsive UI" },
+    { name: "JavaScript", category: "Web Development", icon: "bi-filetype-js", percent: "75%", level: "Proficient", tag: "Interactive Web Apps" },
+    { name: "Git & GitHub", category: "Other Technologies", icon: "bi-github", percent: "85%", level: "Advanced", tag: "Version Control & CI/CD" },
+    { name: "Figma", category: "Other Technologies", icon: "bi-bezier2", percent: "80%", level: "Proficient", tag: "UI/UX & Prototyping" }
   ];
 
   const filteredSkills =
@@ -683,6 +700,13 @@ function App() {
 
   return (
     <>
+      {/* ================= AMBIENT BACKGROUND GLOW ================= */}
+      <div className="ambient-glow-wrapper" aria-hidden="true">
+        <div className="ambient-orb ambient-orb-1"></div>
+        <div className="ambient-orb ambient-orb-2"></div>
+        <div className="ambient-orb ambient-orb-3"></div>
+      </div>
+
       {/* ================= SCROLL PROGRESS BAR ================= */}
       <div
         className="scroll-progress-bar"
@@ -704,6 +728,9 @@ function App() {
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#portfolioNavbar"
+            aria-controls="portfolioNavbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
           >
             <span className="navbar-toggler-icon"></span>
           </button>
@@ -742,16 +769,25 @@ function App() {
 
             </ul>
 
-            <button
-              type="button"
-              className="theme-toggle"
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-            >
-              <i className={`bi ${theme === "light" ? "bi-moon-stars" : "bi-sun"}`}></i>
-            </button>
+            <div className="navbar-actions">
+              <a
+                href="#contact"
+                className="nav-cta-button"
+              >
+                <span>Hire Me</span>
+                <i className="bi bi-arrow-right"></i>
+              </a>
 
-
+              <button
+                type="button"
+                className="theme-toggle"
+                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+                title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+              >
+                <i className={`bi ${theme === "light" ? "bi-moon-stars" : "bi-sun"}`}></i>
+              </button>
+            </div>
 
           </div>
 
@@ -777,7 +813,7 @@ function App() {
               <span className="status-dot">
                 <span className="status-dot-ping"></span>
               </span>
-              <span>Available for New Roles & Opportunities</span>
+              <span>Available for Data Science & AI Opportunities</span>
             </div>
 
             <p className="small-label">HELLO, I'M</p>
@@ -786,69 +822,78 @@ function App() {
               Krishna <span>Sahu</span>
             </h1>
 
-            <h2>
-              Aspiring Data Scientist | AI/ML Enthusiast
+            <h2 className="hero-role-heading">
+              <span className="role-prefix">Passionate </span>
+              <span className="role-dynamic-badge">
+                {dynamicRoles[roleIndex]}
+              </span>
             </h2>
 
             <p className="hero-description">
-              I'm passionate about turning data into meaningful
-              insights and building intelligent solutions for
-              real-world problems. I love learning new technologies
-              and creating impactful projects that make a difference.
+              MCA Student at MIT Manipal (Manipal University, Karnataka) & B.Sc IT Graduate. 
+              I specialize in turning raw data into actionable intelligence, training predictive machine learning models, 
+              and crafting production-ready analytics systems for real-world impact.
             </p>
 
             <div className="hero-buttons">
 
               <a href="#projects" className="dark-button">
-                <span>View My Work</span>
+                <span>Explore Projects</span>
                 <i className="bi bi-arrow-right"></i>
               </a>
 
-              <a href="#contact" className="outline-button">
+              <button
+                type="button"
+                className="outline-button"
+                onClick={handleResumeDownload}
+              >
+                <span>Download Resume</span>
+                <i className="bi bi-download"></i>
+              </button>
+
+              <a href="#contact" className="ghost-button">
                 <span>Let's Connect</span>
                 <i className="bi bi-chat-dots-fill"></i>
               </a>
-
-
 
             </div>
 
             <div className="social-icons">
 
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer">
+              <a href="https://linkedin.com" target="_blank" rel="noreferrer" title="LinkedIn Profile">
                 <i className="bi bi-linkedin"></i>
               </a>
 
-              <a href="https://github.com" target="_blank" rel="noreferrer">
+              <a href="https://github.com" target="_blank" rel="noreferrer" title="GitHub Profile">
                 <i className="bi bi-github"></i>
               </a>
 
-              <a href="#">
-                <i className="bi bi-instagram"></i>
+              <a href="mailto:krishnasahu@email.com" title="Direct Email">
+                <i className="bi bi-envelope-fill"></i>
               </a>
 
             </div>
 
             <div className="hero-stats">
 
-              <div>
+              <div className="hero-stat-card">
                 <strong>10+</strong>
-                <span>Projects</span>
+                <span>Projects Built</span>
               </div>
 
-              <div>
-                <strong>3</strong>
+              <div className="hero-stat-card">
+                <strong>96.4%</strong>
+                <span>Model Accuracy</span>
+              </div>
+
+              <div className="hero-stat-card">
+                <strong>6+</strong>
                 <span>Certifications</span>
               </div>
 
-              <div>
-                <strong>1</strong>
-                <span>Years Learning</span>
-              </div>
-
-              <div>
-                <strong>∞</strong>
-                <span>Curiosity</span>
+              <div className="hero-stat-card">
+                <strong>MIT Manipal</strong>
+                <span>MCA Student</span>
               </div>
 
             </div>
@@ -856,21 +901,21 @@ function App() {
           </div>
 
 
-          {/* ================= HERO RIGHT — Glass Card ================= */}
+          {/* ================= HERO RIGHT — Interactive ML Console ================= */}
           <div className="hero-right">
 
             <div className="hero-orbit"></div>
 
             <div className="hero-chip hero-chip-1">
-              <i className="bi bi-cpu"></i> Machine Learning
+              <i className="bi bi-cpu-fill"></i> Machine Learning
             </div>
 
             <div className="hero-chip hero-chip-2">
-              <i className="bi bi-bar-chart-line"></i> Power BI
+              <i className="bi bi-bar-chart-line-fill"></i> Power BI & SQL
             </div>
 
             <div className="hero-chip hero-chip-3">
-              <i className="bi bi-database"></i> SQL & Python
+              <i className="bi bi-mortarboard-fill"></i> MIT Manipal (MCA)
             </div>
 
             <div className="hero-card">
@@ -878,43 +923,99 @@ function App() {
               <div className="hero-card-header">
 
                 <div className="hero-card-dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+                  <span className="dot-red"></span>
+                  <span className="dot-yellow"></span>
+                  <span className="dot-green"></span>
                 </div>
 
-                <div className="hero-card-title">
-                  krishna@portfolio:~/data-science
+                <div className="hero-card-tabs">
+                  <button
+                    type="button"
+                    className={`hero-tab ${activeHeroTab === "train" ? "active" : ""}`}
+                    onClick={() => setActiveHeroTab("train")}
+                  >
+                    <i className="bi bi-file-earmark-code"></i> pipeline.py
+                  </button>
+                  <button
+                    type="button"
+                    className={`hero-tab ${activeHeroTab === "metrics" ? "active" : ""}`}
+                    onClick={() => setActiveHeroTab("metrics")}
+                  >
+                    <i className="bi bi-graph-up"></i> metrics.json
+                  </button>
+                </div>
+
+                <div className="hero-card-badge">
+                  <span className="pulse-indicator"></span> Python 3.11
                 </div>
 
               </div>
 
-              <div className="hero-code"></div>
-              <div className="hero-code"></div>
-              <div className="hero-code"></div>
-              <div className="hero-code"></div>
-              <div className="hero-code"></div>
+              {activeHeroTab === "train" ? (
+                <div className="hero-terminal-body">
+                  <div className="code-line"><span className="code-kw">import</span> <span className="code-lib">pandas</span> <span className="code-kw">as</span> <span className="code-alias">pd</span>, <span className="code-lib">torch</span></div>
+                  <div className="code-line"><span className="code-kw">from</span> <span className="code-lib">sklearn.ensemble</span> <span className="code-kw">import</span> <span className="code-cls">RandomForestClassifier</span></div>
+                  <div className="code-line code-comment"># Data Science & Predictive Pipeline</div>
+                  <div className="code-line"><span className="code-var">model</span> = <span className="code-cls">RandomForestClassifier</span>(n_estimators=<span className="code-num">200</span>, max_depth=<span className="code-num">12</span>)</div>
+                  <div className="code-line"><span className="code-var">model</span>.<span className="code-func">fit</span>(X_train, y_train)</div>
+                  <div className="code-line code-output">
+                    <span className="output-prompt">➜</span> <span className="output-text">Model Trained:</span> <strong className="output-acc">96.4% Accuracy</strong> <span className="output-status">[OPTIMAL]</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="hero-terminal-body">
+                  <div className="code-line"><span className="code-punc">&#123;</span></div>
+                  <div className="code-line">&nbsp;&nbsp;<span className="code-key">"model"</span>: <span className="code-str">"RandomForestClassifier"</span>,</div>
+                  <div className="code-line">&nbsp;&nbsp;<span className="code-key">"accuracy"</span>: <span className="code-num">0.964</span>,</div>
+                  <div className="code-line">&nbsp;&nbsp;<span className="code-key">"precision"</span>: <span className="code-num">0.958</span>,</div>
+                  <div className="code-line">&nbsp;&nbsp;<span className="code-key">"status"</span>: <span className="code-str">"Optimal Convergence"</span></div>
+                  <div className="code-line"><span className="code-punc">&#125;</span></div>
+                </div>
+              )}
 
-              <div className="hero-chart">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
+              {/* Training Progress Bar */}
+              <div className="hero-model-status">
+                <div className="status-meta">
+                  <span><i className="bi bi-lightning-charge-fill"></i> Epoch 50/50</span>
+                  <span className="loss-val">Loss: 0.0381 (converged)</span>
+                </div>
+                <div className="model-progress-track">
+                  <div className="model-progress-fill"></div>
+                </div>
+              </div>
+
+              {/* Feature Importance / Accuracy Chart */}
+              <div className="hero-chart-container">
+                <div className="chart-header">
+                  <span><i className="bi bi-bar-chart-fill"></i> Feature Importance</span>
+                  <span className="chart-sub">Model Weights</span>
+                </div>
+                <div className="hero-chart">
+                  <div className="chart-col" style={{ "--h": "88%" }}><span className="bar-tip">88%</span><div className="bar-fill"></div><small>Py</small></div>
+                  <div className="chart-col" style={{ "--h": "94%" }}><span className="bar-tip">94%</span><div className="bar-fill"></div><small>ML</small></div>
+                  <div className="chart-col" style={{ "--h": "82%" }}><span className="bar-tip">82%</span><div className="bar-fill"></div><small>SQL</small></div>
+                  <div className="chart-col" style={{ "--h": "76%" }}><span className="bar-tip">76%</span><div className="bar-fill"></div><small>BI</small></div>
+                  <div className="chart-col" style={{ "--h": "90%" }}><span className="bar-tip">90%</span><div className="bar-fill"></div><small>AI</small></div>
+                  <div className="chart-col" style={{ "--h": "85%" }}><span className="bar-tip">85%</span><div className="bar-fill"></div><small>Math</small></div>
+                </div>
               </div>
 
               <div className="hero-kpis">
 
                 <div className="hero-kpi">
-                  <span>Accuracy</span>
-                  <strong>96.4%</strong>
+                  <div className="kpi-icon-wrap"><i className="bi bi-check2-circle"></i></div>
+                  <div>
+                    <span>Accuracy</span>
+                    <strong>96.4%</strong>
+                  </div>
                 </div>
 
                 <div className="hero-kpi">
-                  <span>Models Built</span>
-                  <strong>12+</strong>
+                  <div className="kpi-icon-wrap"><i className="bi bi-cpu"></i></div>
+                  <div>
+                    <span>Models Built</span>
+                    <strong>12+ Active</strong>
+                  </div>
                 </div>
 
               </div>
@@ -945,25 +1046,27 @@ function App() {
             <p className="small-label">ABOUT ME</p>
 
             <h2>
-              Driven by Curiosity
+              Driven by Curiosity.
               <br />
               <span>Powered by Data.</span>
             </h2>
 
-            <p>
-              I'm Krishna Sahu, an MCA student at MIT Manipal (Manipal University, Karnataka) and a B.Sc IT graduate with a
-              strong interest in Data Science, Machine Learning and AI.
-              I enjoy exploring data, finding patterns and building
-              solutions that create real impact.
+            <p className="about-lead">
+              I'm Krishna Sahu, currently pursuing my <strong>Master of Computer Applications (MCA)</strong> at <strong>MIT Manipal (Manipal University, Karnataka)</strong> and a <strong>B.Sc IT passout graduate</strong> with a passion for Data Science, Machine Learning, and Intelligent Systems.
             </p>
 
             <p>
-              I'm constantly learning, building projects and looking
-              for opportunities to grow in the field of AI and Data
-              Science.
+              I thrive on uncovering meaningful patterns within complex datasets, engineering predictive models, and crafting software solutions that translate analytical findings into measurable real-world impact.
             </p>
 
-            <div className="signature">Krishna Sahu</div>
+            <p>
+              Whether it's training statistical learning algorithms, designing intuitive Power BI dashboards, or writing clean SQL queries, I'm dedicated to continuous learning, curiosity, and technical craft.
+            </p>
+
+            <div className="about-signature-wrap">
+              <div className="signature">Krishna Sahu</div>
+              <span className="signature-title">MCA Candidate · Data Science & AI</span>
+            </div>
 
           </div>
 
@@ -978,7 +1081,7 @@ function App() {
             </div>
 
             <div className="about-chip about-chip-2">
-              <i className="bi bi-mortarboard-fill"></i> MCA Student
+              <i className="bi bi-mortarboard-fill"></i> MIT Manipal (MCA)
             </div>
 
             <div className="about-profile-card">
@@ -990,7 +1093,7 @@ function App() {
                   <span></span>
                 </div>
                 <div className="about-profile-title">
-                  profile.json
+                  krishna_profile.json
                 </div>
               </div>
 
@@ -1000,7 +1103,7 @@ function App() {
 
                 <div className="about-profile-name">
                   <strong>Krishna Sahu</strong>
-                  <span>Data Scientist · AI/ML</span>
+                  <span>Data Scientist · AI/ML Engineer</span>
                 </div>
 
               </div>
@@ -1008,25 +1111,25 @@ function App() {
               <div className="about-profile-info">
 
                 <div>
-                  <i className="bi bi-geo-alt"></i>
-                  Manipal, Karnataka
+                  <i className="bi bi-geo-alt-fill"></i>
+                  Manipal, Karnataka, India
                 </div>
 
                 <div>
-                  <i className="bi bi-mortarboard"></i>
+                  <i className="bi bi-mortarboard-fill"></i>
                   MIT Manipal, Manipal University Karnataka
                 </div>
 
                 <div>
-                  <i className="bi bi-cpu"></i>
-                  Focus: AI · ML · Data Science
+                  <i className="bi bi-cpu-fill"></i>
+                  Specialization: AI · ML · Data Science
                 </div>
 
               </div>
 
               <div className="about-skill">
                 <div className="about-skill-header">
-                  <span>Python</span>
+                  <span>Python & Data Pipelines</span>
                   <span>90%</span>
                 </div>
                 <div className="about-skill-bar">
@@ -1036,7 +1139,7 @@ function App() {
 
               <div className="about-skill">
                 <div className="about-skill-header">
-                  <span>Machine Learning</span>
+                  <span>Machine Learning & Modeling</span>
                   <span>85%</span>
                 </div>
                 <div className="about-skill-bar">
@@ -1046,7 +1149,7 @@ function App() {
 
               <div className="about-skill">
                 <div className="about-skill-header">
-                  <span>SQL</span>
+                  <span>SQL & Business Analytics</span>
                   <span>85%</span>
                 </div>
                 <div className="about-skill-bar">
@@ -1056,7 +1159,7 @@ function App() {
 
               <div className="about-status">
                 <span className="about-status-dot"></span>
-                Open to opportunities
+                <span>Open for Data Science Roles & Internships</span>
               </div>
 
             </div>
@@ -1068,7 +1171,7 @@ function App() {
 
             <div className="detail-item">
               <div className="detail-icon">
-                <i className="bi bi-person"></i>
+                <i className="bi bi-person-fill"></i>
               </div>
               <div>
                 <b>Name</b>
@@ -1078,17 +1181,17 @@ function App() {
 
             <div className="detail-item">
               <div className="detail-icon">
-                <i className="bi bi-mortarboard"></i>
+                <i className="bi bi-mortarboard-fill"></i>
               </div>
               <div>
                 <b>Education</b>
-                <span>MCA (MIT Manipal) | B.Sc IT Graduate</span>
+                <span>MCA (MIT Manipal) · B.Sc IT Graduate</span>
               </div>
             </div>
 
             <div className="detail-item">
               <div className="detail-icon">
-                <i className="bi bi-geo-alt"></i>
+                <i className="bi bi-geo-alt-fill"></i>
               </div>
               <div>
                 <b>Location</b>
@@ -1098,11 +1201,11 @@ function App() {
 
             <div className="detail-item">
               <div className="detail-icon">
-                <i className="bi bi-grid"></i>
+                <i className="bi bi-grid-fill"></i>
               </div>
               <div>
-                <b>Interests</b>
-                <span>Data Science, AI/ML, Web Development</span>
+                <b>Key Interests</b>
+                <span>Data Science, AI/ML, Full-Stack Engineering</span>
               </div>
             </div>
 
@@ -1111,8 +1214,8 @@ function App() {
                 <i className="bi bi-bullseye"></i>
               </div>
               <div>
-                <b>Goal</b>
-                <span>To build intelligent solutions and grow continuously</span>
+                <b>Career Goal</b>
+                <span>Engineer scalable data systems & intelligent models</span>
               </div>
             </div>
 
@@ -1171,6 +1274,8 @@ function App() {
                 name={skill.name}
                 icon={skill.icon}
                 percent={skill.percent}
+                level={skill.level}
+                tag={skill.tag}
               />
 
             ))}
@@ -1464,21 +1569,11 @@ function App() {
               date="Jun – Aug 2025"
               title="Data Analytics Internship"
               subtitle="Data Science & Machine Learning"
-              icon="bi-briefcase"
+              icon="bi-briefcase-fill"
+              badge="Industry Experience"
               points={[
-                "Worked on data cleaning, visualization and dashboard creation using Python, SQL and Power BI.",
-                "Gained hands-on experience with real-world datasets."
-              ]}
-            />
-
-            <TimelineItem
-              date="Jan – May 2024"
-              title="Academic Projects"
-              subtitle="Personal Learning"
-              icon="bi-diagram-3"
-              points={[
-                "Built multiple mini projects in AI/ML, web and data analysis.",
-                "Explored real-world datasets and improved technical and problem-solving skills."
+                "Worked on data cleaning, transformation, feature analysis and dynamic dashboard creation using Python, SQL and Power BI.",
+                "Gained hands-on experience handling real-world datasets, calculating business KPIs, and presenting actionable metrics."
               ]}
             />
 
@@ -1486,21 +1581,35 @@ function App() {
               date="2024 – Present"
               title="Master of Computer Applications (MCA)"
               subtitle="MIT Manipal, Manipal University Karnataka"
-              icon="bi-mortarboard"
+              icon="bi-mortarboard-fill"
+              badge="Postgraduate Degree"
               points={[
-                "Currently pursuing MCA with a focus on advanced computer applications, AI/ML, and data science.",
-                "Actively building intelligent solutions, full-stack systems, and exploring modern technologies."
+                "Currently pursuing MCA with specialized coursework in Advanced Algorithms, Machine Learning, Deep Learning, and Cloud Systems.",
+                "Actively developing intelligent end-to-end applications, predictive models, and full-stack solutions."
               ]}
             />
 
             <TimelineItem
-              date="Completed"
+              date="Jan – May 2024"
+              title="Applied AI & Data Science Projects"
+              subtitle="Research & Project Implementation"
+              icon="bi-diagram-3-fill"
+              badge="Project Lab"
+              points={[
+                "Built multiple end-to-end projects in Machine Learning, exploratory data analysis, and predictive modeling.",
+                "Worked with real-world Kaggle datasets and engineered statistical features with Python, Scikit-learn and Pandas."
+              ]}
+            />
+
+            <TimelineItem
+              date="Graduated"
               title="B.Sc in Information Technology (B.Sc IT)"
               subtitle="Passout Graduate"
-              icon="bi-mortarboard"
+              icon="bi-mortarboard-fill"
+              badge="Bachelor's Degree"
               points={[
-                "Graduated with a strong foundation in Information Technology, software development, database systems, and networking.",
-                "Completed multiple academic projects and gained practical problem-solving skills."
+                "Graduated with a strong technical foundation in software engineering, database management systems, and object-oriented programming.",
+                "Completed multiple academic capstones and developed practical software problem-solving skills."
               ]}
             />
 
@@ -1592,28 +1701,74 @@ function App() {
 
               <div className="resume-paper">
 
-                <h3>Krishna Sahu</h3>
+                <div className="resume-paper-header">
+                  <span className="resume-badge">CURRICULUM VITAE</span>
+                  <span className="resume-verified-badge">
+                    <i className="bi bi-patch-check-fill"></i> Verified Candidate
+                  </span>
+                </div>
 
-                <div className="resume-lines"></div>
-                <div className="resume-lines short"></div>
-
-                <div className="resume-columns">
-
+                <div className="resume-paper-profile">
+                  <div className="resume-avatar-mini">KS</div>
                   <div>
-                    <b>Education</b>
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                    <h3>Krishna Sahu</h3>
+                    <p className="resume-subtitle">Aspiring Data Scientist & AI/ML Engineer</p>
+                    <div className="resume-contact-pills">
+                      <span><i className="bi bi-mortarboard-fill"></i> MCA @ MIT Manipal</span>
+                      <span><i className="bi bi-geo-alt-fill"></i> Manipal, Karnataka</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="resume-divider"></div>
+
+                <div className="resume-columns-grid">
+
+                  <div className="resume-col">
+                    <div className="resume-section-head">
+                      <i className="bi bi-mortarboard"></i>
+                      <b>Education</b>
+                    </div>
+                    <div className="resume-item">
+                      <strong>Master of Computer Applications (MCA)</strong>
+                      <span>MIT Manipal, Manipal University Karnataka</span>
+                      <small>2024 – Present · Specializing in Data Science & AI/ML</small>
+                    </div>
+                    <div className="resume-item">
+                      <strong>B.Sc in Information Technology</strong>
+                      <span>Passout Graduate · Software & Algorithms</span>
+                    </div>
                   </div>
 
-                  <div>
-                    <b>Skills</b>
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                  <div className="resume-col">
+                    <div className="resume-section-head">
+                      <i className="bi bi-cpu"></i>
+                      <b>Core Skills</b>
+                    </div>
+                    <div className="resume-skill-tags">
+                      <span>Python</span>
+                      <span>Machine Learning</span>
+                      <span>SQL</span>
+                      <span>Power BI</span>
+                      <span>NumPy & Pandas</span>
+                      <span>Scikit-Learn</span>
+                      <span>Data Analysis</span>
+                    </div>
+
+                    <div className="resume-section-head" style={{ marginTop: "14px" }}>
+                      <i className="bi bi-trophy"></i>
+                      <b>Certifications</b>
+                    </div>
+                    <ul className="resume-bullet-list">
+                      <li>Google Data Analytics Professional</li>
+                      <li>Coursera Machine Learning Specialization</li>
+                      <li>Microsoft Power BI Analyst</li>
+                    </ul>
                   </div>
 
                 </div>
+
+                <div className="resume-watermark">KRISHNA SAHU · MIT MANIPAL</div>
 
               </div>
 
@@ -1645,8 +1800,8 @@ function App() {
                 </div>
 
                 <div>
-                  <b>View Resume</b>
-                  <span>Open in new tab</span>
+                  <b>View Full Resume</b>
+                  <span>Open PDF in new tab</span>
                 </div>
 
               </a>
@@ -1671,7 +1826,7 @@ function App() {
 
                 <div>
                   <b>Download Resume</b>
-                  <span>Get a copy for offline use</span>
+                  <span>Get offline PDF copy</span>
                 </div>
 
               </button>
@@ -1701,16 +1856,16 @@ function App() {
 
                 <div>
                   <b>Share Resume</b>
-                  <span>Share my resume</span>
+                  <span>Send direct link or file</span>
                 </div>
 
               </button>
 
 
               <div className="resume-quote">
-                "Prepared Today for
-                <br />
-                a Brighter Tomorrow."
+                <i className="bi bi-quote quote-icon"></i>
+                <p>"Driven by curiosity, grounded in data, and dedicated to building real-world intelligent systems."</p>
+                <div className="quote-author">— Krishna Sahu</div>
               </div>
 
             </div>
@@ -2018,18 +2173,21 @@ function App() {
                   icon="bi-envelope-fill"
                   title="Email"
                   text="krishnasahu@email.com"
+                  copyable={true}
                 />
 
                 <ContactItem
                   icon="bi-linkedin"
                   title="LinkedIn"
                   text="linkedin.com/in/krishna-sahu"
+                  link="https://linkedin.com"
                 />
 
                 <ContactItem
                   icon="bi-github"
                   title="GitHub"
                   text="github.com/krishna-sahu"
+                  link="https://github.com"
                 />
 
                 <ContactItem
@@ -2038,6 +2196,16 @@ function App() {
                   text="Manipal, Karnataka, India"
                 />
 
+              </div>
+
+              <div className="contact-status-card">
+                <span className="status-dot">
+                  <span className="status-dot-ping"></span>
+                </span>
+                <div>
+                  <strong>Currently Available</strong>
+                  <span>Open for Data Science, Machine Learning & Analytics roles</span>
+                </div>
               </div>
 
             </div>
@@ -2342,16 +2510,16 @@ function App() {
    SKILL COMPONENT
 ===================================================== */
 
-function Skill({ name, icon, percent }) {
+function Skill({ name, icon, percent, level, tag }) {
 
   return (
 
     <motion.div
       className="technology-card"
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.5 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.4 }}
       whileHover={{ y: -6 }}
     >
 
@@ -2361,7 +2529,10 @@ function Skill({ name, icon, percent }) {
           <i className={`bi ${icon}`}></i>
         </div>
 
-        <strong>{name}</strong>
+        <div className="technology-meta">
+          <strong>{name}</strong>
+          {tag && <span className="technology-tag">{tag}</span>}
+        </div>
 
       </div>
 
@@ -2369,7 +2540,10 @@ function Skill({ name, icon, percent }) {
         <span style={{ width: percent }}></span>
       </div>
 
-      <small>{percent}</small>
+      <div className="skill-footer">
+        <span className="skill-level">{level || "Proficient"}</span>
+        <small>{percent}</small>
+      </div>
 
     </motion.div>
 
@@ -2406,7 +2580,8 @@ function ProjectCard({
     >
 
       <div className="project-image-new">
-        <img src={image} alt={title} />
+        <span className="project-category-badge">{category}</span>
+        <img src={image} alt={title} loading="lazy" />
       </div>
 
       <div className="project-body">
@@ -2495,15 +2670,20 @@ function ProjectCard({
    TIMELINE COMPONENT
 ===================================================== */
 
-function TimelineItem({ date, title, subtitle, icon, points }) {
+function TimelineItem({ date, title, subtitle, icon, badge, points }) {
 
   return (
 
     <div className="timeline-item">
 
-      <div className="timeline-date">{date}</div>
+      <div className="timeline-date">
+        <span>{date}</span>
+        {badge && <span className="timeline-badge">{badge}</span>}
+      </div>
 
-      <div className="timeline-dot"></div>
+      <div className="timeline-dot">
+        <span className="timeline-dot-ping"></span>
+      </div>
 
       <div className="timeline-card">
 
@@ -2511,7 +2691,7 @@ function TimelineItem({ date, title, subtitle, icon, points }) {
           <i className={`bi ${icon}`}></i>
         </div>
 
-        <div>
+        <div className="timeline-content">
 
           <h3>{title}</h3>
 
@@ -2547,9 +2727,10 @@ function Certificate({ icon, title, company, category }) {
         <i className={`bi ${icon}`}></i>
       </div>
 
-      <div>
+      <div className="certificate-info">
+        <span className="certificate-badge">{category}</span>
         <h3>{title}</h3>
-        <p>{company}</p>
+        <p><i className="bi bi-patch-check-fill"></i> {company}</p>
       </div>
 
       <a
@@ -2567,7 +2748,7 @@ function Certificate({ icon, title, company, category }) {
           }).catch((error) => console.error("Certificate analytics error:", error));
         }}
       >
-        <span>View Credential</span>
+        <span>Credential</span>
         <i className="bi bi-arrow-up-right"></i>
       </a>
 
@@ -2581,20 +2762,58 @@ function Certificate({ icon, title, company, category }) {
    CONTACT COMPONENT
 ===================================================== */
 
-function ContactItem({ icon, title, text }) {
+function ContactItem({ icon, title, text, link, copyable }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleAction = () => {
+    if (copyable) {
+      navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } else if (link) {
+      window.open(link, "_blank", "noreferrer");
+    }
+  };
 
   return (
 
-    <div className="contact-item-new">
+    <div
+      className={`contact-item-new ${link || copyable ? "clickable" : ""}`}
+      onClick={handleAction}
+      role={link || copyable ? "button" : undefined}
+      tabIndex={link || copyable ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleAction();
+        }
+      }}
+    >
 
       <div className="contact-icon-new">
         <i className={`bi ${icon}`}></i>
       </div>
 
-      <div>
+      <div className="contact-details">
         <b>{title}</b>
         <span>{text}</span>
       </div>
+
+      {copyable && (
+        <span className="contact-action-badge">
+          {copied ? (
+            <><i className="bi bi-check-lg"></i> Copied</>
+          ) : (
+            <><i className="bi bi-clipboard"></i> Copy</>
+          )}
+        </span>
+      )}
+
+      {link && !copyable && (
+        <span className="contact-action-badge link-arrow">
+          <i className="bi bi-arrow-up-right"></i>
+        </span>
+      )}
 
     </div>
 
