@@ -2561,6 +2561,15 @@ function ProjectCard({
   liveDemo,
   onViewDetails
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isLongDescription = Boolean(description && description.length > 115);
+
+  const getTruncatedText = (text, maxLength = 110) => {
+    if (!text || text.length <= maxLength) return text;
+    const truncated = text.slice(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(" ");
+    return (lastSpace > 40 ? truncated.slice(0, lastSpace) : truncated) + "...";
+  };
 
   return (
 
@@ -2590,7 +2599,29 @@ function ProjectCard({
           ))}
         </div>
 
-        <p className="project-description">{description}</p>
+        <div className="project-description-wrapper">
+          <p className="project-description">
+            {isLongDescription && !isExpanded
+              ? getTruncatedText(description)
+              : description}
+          </p>
+
+          {isLongDescription && (
+            <button
+              type="button"
+              className="project-show-more-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsExpanded((prev) => !prev);
+              }}
+              aria-expanded={isExpanded}
+            >
+              <span>{isExpanded ? "Show Less" : "Show More"}</span>
+              <i className={`bi ${isExpanded ? "bi-chevron-up" : "bi-chevron-down"}`}></i>
+            </button>
+          )}
+        </div>
 
         <div className="project-links">
 
