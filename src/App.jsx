@@ -253,17 +253,17 @@ function App() {
 
   // ================= SKILLS DATA =================
   const skills = [
-    { name: "Python", category: "Programming", icon: "bi-code-slash", percent: "90%", level: "Advanced", tag: "AI, ML & Pandas" },
-    { name: "Machine Learning", category: "Machine Learning", icon: "bi-robot", percent: "85%", level: "Advanced", tag: "Supervised & Deep Learning" },
-    { name: "SQL", category: "Data Analysis", icon: "bi-database", percent: "85%", level: "Advanced", tag: "Complex Queries & Joins" },
-    { name: "Power BI", category: "Data Analysis", icon: "bi-bar-chart-fill", percent: "80%", level: "Proficient", tag: "DAX & Dashboards" },
-    { name: "NumPy & Pandas", category: "Data Analysis", icon: "bi-box", percent: "85%", level: "Advanced", tag: "Data Wrangling & Analysis" },
-    { name: "Java", category: "Programming", icon: "bi-cup-hot", percent: "80%", level: "Proficient", tag: "OOP & Data Structures" },
-    { name: "MySQL", category: "Other Technologies", icon: "bi-database-fill", percent: "80%", level: "Proficient", tag: "Relational Schemas" },
-    { name: "HTML & CSS", category: "Web Development", icon: "bi-filetype-html", percent: "85%", level: "Advanced", tag: "Modern Responsive UI" },
-    { name: "JavaScript", category: "Web Development", icon: "bi-filetype-js", percent: "75%", level: "Proficient", tag: "Interactive Web Apps" },
-    { name: "Git & GitHub", category: "Other Technologies", icon: "bi-github", percent: "85%", level: "Advanced", tag: "Version Control & CI/CD" },
-    { name: "Figma", category: "Other Technologies", icon: "bi-bezier2", percent: "80%", level: "Proficient", tag: "UI/UX & Prototyping" }
+    { name: "Python", category: "Data Science & AI", icon: "bi-code-slash", level: "Advanced", tag: "Data Analysis & ML" },
+    { name: "Machine Learning", category: "Data Science & AI", icon: "bi-robot", level: "Advanced", tag: "Supervised & Deep Learning" },
+    { name: "NumPy & Pandas", category: "Data Science & AI", icon: "bi-table", level: "Advanced", tag: "Data Wrangling & Processing" },
+    { name: "SQL", category: "Data Analytics", icon: "bi-database", level: "Advanced", tag: "Complex Queries & Analytics" },
+    { name: "Power BI", category: "Data Analytics", icon: "bi-bar-chart-fill", level: "Proficient", tag: "DAX & Business Dashboards" },
+    { name: "MySQL", category: "Data Analytics", icon: "bi-database-fill", level: "Proficient", tag: "Relational DB Architecture" },
+    { name: "Java", category: "Software & Web", icon: "bi-cup-hot-fill", level: "Proficient", tag: "OOP & System Design" },
+    { name: "JavaScript", category: "Software & Web", icon: "bi-filetype-js", level: "Proficient", tag: "Interactive Web Applications" },
+    { name: "HTML & CSS", category: "Software & Web", icon: "bi-filetype-html", level: "Advanced", tag: "Modern UI & Responsive Design" },
+    { name: "Git & GitHub", category: "Tools", icon: "bi-github", level: "Advanced", tag: "Version Control & CI/CD" },
+    { name: "Figma", category: "Tools", icon: "bi-bezier2", level: "Proficient", tag: "UI/UX & Interface Prototyping" }
   ];
 
   const filteredSkills =
@@ -1238,19 +1238,17 @@ function App() {
           </h2>
 
           <p className="section-intro">
-            Here are the tools and technologies I work with to bring
-            ideas to life and solve real-world problems.
+            A curated stack of tools and frameworks I use across data science, machine learning, and full-stack development.
           </p>
 
           <div className="skill-filter">
 
             {[
               "All",
-              "Programming",
-              "Data Analysis",
-              "Machine Learning",
-              "Web Development",
-              "Other Technologies"
+              "Data Science & AI",
+              "Data Analytics",
+              "Software & Web",
+              "Tools"
             ].map((category) => (
 
               <button
@@ -1273,7 +1271,6 @@ function App() {
                 key={skill.name}
                 name={skill.name}
                 icon={skill.icon}
-                percent={skill.percent}
                 level={skill.level}
                 tag={skill.tag}
               />
@@ -2510,39 +2507,36 @@ function App() {
    SKILL COMPONENT
 ===================================================== */
 
-function Skill({ name, icon, percent, level, tag }) {
+function Skill({ name, icon, level, tag }) {
+  const isAdvanced = level === "Advanced";
 
   return (
 
     <motion.div
       className="technology-card"
-      initial={{ opacity: 0, y: 25 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.4 }}
-      whileHover={{ y: -6 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.3 }}
+      whileHover={{ y: -4 }}
     >
 
-      <div className="technology-top">
+      <div className="technology-card-header">
 
         <div className="technology-icon">
           <i className={`bi ${icon}`}></i>
         </div>
 
-        <div className="technology-meta">
-          <strong>{name}</strong>
-          {tag && <span className="technology-tag">{tag}</span>}
+        <div className={`technology-badge ${isAdvanced ? "badge-advanced" : "badge-proficient"}`}>
+          <span className="technology-dot"></span>
+          <span>{level || "Proficient"}</span>
         </div>
 
       </div>
 
-      <div className="skill-progress">
-        <span style={{ width: percent }}></span>
-      </div>
-
-      <div className="skill-footer">
-        <span className="skill-level">{level || "Proficient"}</span>
-        <small>{percent}</small>
+      <div className="technology-meta">
+        <strong className="technology-name">{name}</strong>
+        {tag && <span className="technology-tag">{tag}</span>}
       </div>
 
     </motion.div>
