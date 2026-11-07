@@ -384,7 +384,7 @@ img { max-width: 100%; display: block; }
 .nav-cta-button {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   padding: 8px 18px;
   background: var(--gradient);
   color: #ffffff !important;
@@ -399,6 +399,20 @@ img { max-width: 100%; display: block; }
   transform: translateY(-2px);
   box-shadow: 0 6px 24px rgba(34, 211, 238, 0.55);
   color: #ffffff !important;
+}
+
+.nav-cta-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.9);
+  animation: navPulse 2s ease-in-out infinite;
+}
+
+@keyframes navPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.6; }
 }
 
 .nav-cta-button i {

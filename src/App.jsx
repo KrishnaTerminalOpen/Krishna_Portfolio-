@@ -774,7 +774,8 @@ function App() {
                 href="#contact"
                 className="nav-cta-button"
               >
-                <span>Hire Me</span>
+                <span className="nav-cta-dot"></span>
+                <span>Let's Connect</span>
                 <i className="bi bi-arrow-right"></i>
               </a>
 
