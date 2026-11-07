@@ -562,43 +562,52 @@ img { max-width: 100%; display: block; }
 
 .hero-role-heading {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(20px, 2.3vw, 27px);
-  font-weight: 600;
-  color: var(--muted);
-  margin: 0 0 24px;
+  font-size: clamp(22px, 2.5vw, 30px);
+  font-weight: 700;
+  color: var(--white);
+  margin: 0 0 16px;
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+}
+
+.hero-focus-tags {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
+  margin-bottom: 22px;
 }
 
-.role-prefix {
-  color: var(--muted);
-  font-weight: 500;
-  font-size: clamp(16px, 1.8vw, 20px);
-}
-
-.role-dynamic-badge {
-  display: inline-block;
-  padding: 5px 16px;
-  background: linear-gradient(135deg, rgba(124, 92, 255, 0.22), rgba(34, 211, 238, 0.16));
-  border: 1px solid rgba(124, 92, 255, 0.45);
+.hero-focus-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: rgba(124, 92, 255, 0.08);
+  border: 1px solid rgba(124, 92, 255, 0.22);
   border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
   color: #38bdf8;
-  font-weight: 700;
-  box-shadow: 0 0 20px rgba(124, 92, 255, 0.25);
-  animation: pulseRole 2.8s ease-in-out infinite;
+  letter-spacing: 0.2px;
+  transition: all 0.25s ease;
 }
 
-@keyframes pulseRole {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(124, 92, 255, 0.25);
-    border-color: rgba(124, 92, 255, 0.45);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(34, 211, 238, 0.45);
-    border-color: rgba(34, 211, 238, 0.7);
-  }
+.hero-focus-tag i {
+  font-size: 11px;
+  color: #7c5cff;
+}
+
+.hero-focus-tag:hover {
+  background: rgba(124, 92, 255, 0.16);
+  border-color: rgba(34, 211, 238, 0.5);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(124, 92, 255, 0.25);
+}
+
+.hero-focus-tag:hover i {
+  color: #22d3ee;
 }
 
 .hero-description {
@@ -3584,6 +3593,22 @@ img { max-width: 100%; display: block; }
   background: rgba(8, 145, 178, 0.08);
   border-color: rgba(8, 145, 178, 0.25);
   color: #0891b2;
+}
+
+[data-theme="light"] .hero-focus-tag {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.1);
+  color: #0891b2;
+}
+
+[data-theme="light"] .hero-focus-tag i {
+  color: #6d43ff;
+}
+
+[data-theme="light"] .hero-focus-tag:hover {
+  background: rgba(109, 67, 255, 0.08);
+  border-color: #6d43ff;
+  color: #0f172a;
 }
 
 [data-theme="light"] .project-btn-code {

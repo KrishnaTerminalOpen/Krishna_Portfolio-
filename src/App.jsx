@@ -26,23 +26,8 @@ function App() {
   const [databaseProjects, setDatabaseProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
 
-  // ================= DYNAMIC HERO ROLES & TERMINAL TABS =================
-  const dynamicRoles = [
-    "Aspiring Data Scientist",
-    "Machine Learning Enthusiast",
-    "Python & SQL Specialist",
-    "MCA Student @ MIT Manipal",
-    "AI Systems Builder"
-  ];
-  const [roleIndex, setRoleIndex] = useState(0);
+  // ================= HERO TERMINAL TABS =================
   const [activeHeroTab, setActiveHeroTab] = useState("train");
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setRoleIndex((prev) => (prev + 1) % dynamicRoles.length);
-    }, 2800);
-    return () => clearInterval(timer);
-  }, [dynamicRoles.length]);
 
   // ================= STEP 4: PROJECT DETAILS STATE =================
   const [selectedProject, setSelectedProject] = useState(null);
@@ -824,11 +809,23 @@ function App() {
             </h1>
 
             <h2 className="hero-role-heading">
-              <span className="role-prefix">Passionate </span>
-              <span className="role-dynamic-badge">
-                {dynamicRoles[roleIndex]}
-              </span>
+              Data Scientist &amp; <span className="gradient-text">Machine Learning Engineer</span>
             </h2>
+
+            <div className="hero-focus-tags">
+              <span className="hero-focus-tag">
+                <i className="bi bi-cpu"></i>
+                Machine Learning
+              </span>
+              <span className="hero-focus-tag">
+                <i className="bi bi-robot"></i>
+                Predictive Modeling
+              </span>
+              <span className="hero-focus-tag">
+                <i className="bi bi-graph-up-arrow"></i>
+                Data Analytics
+              </span>
+            </div>
 
             <p className="hero-description">
               MCA Student at MIT Manipal (Manipal University, Karnataka) & B.Sc IT Graduate. 
